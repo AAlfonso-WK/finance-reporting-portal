@@ -544,13 +544,22 @@
   }
   function plRow(label) { return { label, rev: 0, dl: 0, dov: 0, dc: 0, ind: 0 }; }
   function addTo(t, f) { for (const k of ["rev", "dl", "dov", "dc", "ind"]) t[k] += f[k]; }
+  const NO_CLIENT = "(No client)";
+  // Default order: Revenue, then Direct Contribution, Profit and Profit % as tie-breakers (all descending); "(No client)" last.
+  const desc = (x, y) => x === y ? 0 : x > y ? -1 : 1;
+  const profitPct = r => Math.abs(r.rev) < 1 ? -Infinity : (r.dc - r.ind) / r.rev;
+  function plOrder(a, b) {
+    if ((a.label === NO_CLIENT) !== (b.label === NO_CLIENT)) return a.label === NO_CLIENT ? 1 : -1;
+    return desc(a.rev, b.rev) || desc(a.dc, b.dc) || desc(a.dc - a.ind, b.dc - b.ind) || desc(profitPct(a), profitPct(b));
+  }
 
   function plClients(year, cutoff) {
     const clients = new Map();
     for (const f of facts) {
       if (f.y !== year || f.m > cutoff) continue;
-      if (!clients.has(f.client)) clients.set(f.client, { leaf: plRow(f.client), wki: null, offices: new Map() });
-      const c = clients.get(f.client);
+      const name = f.client && String(f.client).trim() !== "" ? f.client : NO_CLIENT;
+      if (!clients.has(name)) clients.set(name, { leaf: plRow(name), wki: null, offices: new Map() });
+      const c = clients.get(name);
       if (f.wki) { c.wki = c.wki || plRow("WKI"); addTo(c.wki, f); continue; }
       addTo(c.leaf, f);
       if (!c.offices.has(f.office)) c.offices.set(f.office, plRow(f.office));
@@ -559,7 +568,7 @@
     // Client row: additive measures from the offices; Indirect Costs from the WKI root when it is in scope.
     const list = [...clients.values()].map(c => ({ ...c.leaf, ind: c.wki ? c.wki.ind : c.leaf.ind, offices: [...c.offices.values()] }))
       .filter(c => c.offices.length)
-      .sort((a, b) => b.rev - a.rev);
+      .sort(plOrder);
     const total = plRow("Grand Total");
     list.forEach(c => addTo(total, c));
     return { list, total };
@@ -594,7 +603,7 @@
         drawTable(year, cutoff);
       });
       frag.appendChild(tr("client", btn, cells(c)));
-      if (open) c.offices.sort((a, b) => b.rev - a.rev).forEach(o => frag.appendChild(tr("office", o.label, cells(o))));
+      if (open) c.offices.sort(plOrder).forEach(o => frag.appendChild(tr("office", o.label, cells(o))));
     });
     body.replaceChildren(frag);
   }

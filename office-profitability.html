@@ -550,15 +550,23 @@
     return (v < 0 ? "-$" : "$") + Math.round(Math.abs(v)).toLocaleString("en-US");
   }
   function plRow(label) { return { label, rev: 0, dl: 0, dov: 0, dc: 0, ind: 0 }; }
+  const NO_CLIENT = "(No client)";
+  // Default order: Revenue, then Direct Contribution, Profit and Profit % as tie-breakers (all descending); "(No client)" last.
+  const desc = (x, y) => x === y ? 0 : x > y ? -1 : 1;
+  const profitPct = r => Math.abs(r.rev) < 1 ? -Infinity : (r.dc - r.ind) / r.rev;
+  function plOrder(a, b) {
+    if ((a.label === NO_CLIENT) !== (b.label === NO_CLIENT)) return a.label === NO_CLIENT ? 1 : -1;
+    return desc(a.rev, b.rev) || desc(a.dc, b.dc) || desc(a.dc - a.ind, b.dc - b.ind) || desc(profitPct(a), profitPct(b));
+  }
   function drawClients(office, year, cutoff) {
     const byClient = new Map(), total = plRow("Grand Total");
     for (const f of facts) {
       if (f.office !== office || f.y !== year || f.m > cutoff) continue;
-      const name = f.client && String(f.client).trim() !== "" ? f.client : "(No client)";
+      const name = f.client && String(f.client).trim() !== "" ? f.client : NO_CLIENT;
       if (!byClient.has(name)) byClient.set(name, plRow(name));
       for (const t of [byClient.get(name), total]) for (const k of ["rev", "dl", "dov", "dc", "ind"]) t[k] += f[k];
     }
-    const list = [...byClient.values()].sort((a, b) => b.rev - a.rev);
+    const list = [...byClient.values()].sort(plOrder);
     const cells = r => { const p = r.dc - r.ind;
       return [fmtUsd(r.rev), fmtUsd(r.dl), fmtUsd(r.dov), fmtUsd(r.dc), fmtUsd(r.ind), fmtUsd(p), Math.abs(r.rev) < 1 ? "—" : fmtPct(p / r.rev)]; };
     const tr = (cls, label, vals) => {
