@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="Wieden+Kennedy finance reporting portal for executives.">
+  <meta property="og:title" content="Wieden+Kennedy Finance Portal">
+  <meta property="og:description" content="Executive finance reports from Tableau in one place.">
+  <meta property="og:type" content="website">
+  <title>Wieden+Kennedy Finance Portal</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%23080808'/%3E%3Ctext x='50%25' y='54%25' text-anchor='middle' font-size='18' font-family='Arial' font-weight='700' fill='white'%3EW%2BK%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+  <script src="assets/app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to reports</a>
+  <nav class="site-nav" aria-label="Primary navigation">
+    <a class="site-nav__brand" href="index.html">
+      <span class="site-nav__mark">W+K</span>
+      <span>Finance Portal</span>
+    </a>
+    <div class="site-nav__links" aria-label="Report navigation">
+      <a href="global-client-portfolio.html">Global Client Portfolio</a>
+      <a href="office-profitability.html">Office Profitability</a>
+    </div>
+    <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false">
+      <span class="theme-toggle__icon" aria-hidden="true"></span>
+      <span class="theme-toggle__text" data-theme-label>Dark</span>
+    </button>
+  </nav>
+
+  <main id="main">
+    <header class="home-hero">
+      <div class="container home-hero__grid">
+        <div data-reveal>
+          <p class="eyebrow">Wieden+Kennedy Finance</p>
+          <h1>Finance, framed for decisions.</h1>
+          <p class="home-hero__copy">An executive finance workspace for reading margin, revenue, and office performance without losing the thread between reports.</p>
+          <div class="hero-actions">
+            <a class="button button--solid" href="global-client-portfolio.html">Open Global Client Portfolio</a>
+            <a class="button" href="#agency-reports">Browse reports</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="section" id="agency-reports">
+      <div class="container">
+        <div class="section__head" data-reveal>
+          <div>
+            <p class="eyebrow">Agency overview</p>
+            <h2 class="section__title">Internal reports in one place.</h2>
+          </div>
+          <p class="section__copy">Agency reports share the same rhythm: a short brief, the current signals, and the governed Tableau view beneath them.</p>
+        </div>
+
+        <div class="report-grid" data-reveal>
+          <a class="report-tile" href="global-client-portfolio.html">
+            <span class="tile-kicker">01 - Clients</span>
+            <div>
+              <h3 class="tile-title">Global Client Portfolio</h3>
+              <p class="tile-copy">Revenue, Direct Contribution and Profit by client, with office detail.</p>
+            </div>
+            <span class="tile-arrow">Open report</span>
+          </a>
+          <a class="report-tile" href="office-profitability.html">
+            <span class="tile-kicker">02 - Offices</span>
+            <div>
+              <h3 class="tile-title">Office Profitability</h3>
+              <p class="tile-copy">KPIs, rankings across offices and client contribution for one office.</p>
+            </div>
+            <span class="tile-arrow">Open report</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <span>Wieden+Kennedy Finance</span>
+      <span>Internal reporting portal</span>
+    </div>
+  </footer>
+</body>
+</html>

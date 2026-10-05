@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Office Profitability</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%23080808'/%3E%3Ctext x='50%25' y='54%25' text-anchor='middle' font-size='18' font-family='Arial' font-weight='700' fill='white'%3EW%2BK%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script type="module" src="https://prod-useast-a.online.tableau.com/javascripts/api/tableau.embedding.3.latest.min.js"></script>
+<style>
+  :root {
+    --bg: #F2F1ED; --panel: #FCFCFA; --card: #F4F4F2; --band: #F8F8F5;
+    --ink: #111111; --ink2: #4F4F4A; --ink3: #7B7B74; --line: #DDDDDA; --line2: #C9C9C3;
+    --good: #146B3A; --bad: #C0392B; --good-dark: #4ADE80; --bad-dark: #FF6B5F;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Archivo", system-ui, sans-serif; font-size: 14px; line-height: 1.45; }
+  .pnav { position: sticky; top: 0; z-index: 100; background: #0A0A0A; border-bottom: 1px solid #2A2A2A; display: flex; align-items: center; justify-content: space-between; gap: 28px; padding: 15px clamp(18px, 4vw, 48px); line-height: 1.5; }
+  .pnav__brand { display: inline-flex; align-items: center; gap: 10px; min-width: max-content; color: #fff; text-decoration: none; font-size: 0.76rem; font-weight: 700; letter-spacing: .12em; line-height: 1; text-transform: uppercase; white-space: nowrap; }
+  .pnav__mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: #F8F8F2; color: #0A0A0A; font-size: 0.64rem; font-weight: 700; letter-spacing: 0; }
+  .pnav__links { display: flex; align-items: center; justify-content: flex-end; gap: clamp(10px, 1.8vw, 24px); min-width: 0; }
+  .pnav__links a { font-family: "IBM Plex Mono", Consolas, monospace; font-size: 0.75rem; letter-spacing: .07em; text-transform: uppercase; color: #E7E8E6; text-decoration: none; padding: 8px 16px; border: 1px solid #55554F; border-radius: 999px; transition: background .15s, border-color .15s; }
+  .pnav__links a:hover { background: #2A2A2A; border-color: #A6A6A0; }
+  .pnav__links a[aria-current="page"] { background: #F8F8F2; border-color: #F8F8F2; color: #0A0A0A; font-weight: 600; }
+  .pnav__links a:focus-visible, .pnav__brand:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  @media (max-width: 640px) { .pnav { padding: 10px 16px; } .pnav__brand span:last-child { display: none; } }
+  .pnav + .shell { padding-top: 16px; }
+  .shell { background: #0A0A0A; color: #fff; padding: 20px 24px 18px; }
+  .shell .brand-label { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #B7B7B2; }
+  .shell h1 { font-size: 30px; font-weight: 800; line-height: 1.15; margin: 4px 0 0; }
+  .shell h1 span { font-size: 18px; font-weight: 500; color: #B7B7B2; margin-left: 10px; }
+  .sync { display: inline-flex; align-items: center; gap: 9px; margin-top: 12px; padding: 6px 14px 6px 12px; border: 1px solid #3A3A3A; border-radius: 999px; background: #1C1C1C; font-weight: 600; font-size: 14px; color: #FFFFFF; cursor: default; }
+  .sync .dot { width: 10px; height: 10px; border-radius: 50%; background: #A6A6A0; flex: none; }
+  .sync.loading .dot, .sync.updating .dot, .sync.signin .dot, .sync.cached .dot { background: #FF6B5F; animation: pulse .8s ease-in-out infinite; }
+  .sync.loading, .sync.updating, .sync.signin, .sync.cached { border-color: #FF6B5F; }
+  .signin { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 16px; margin-top: 12px; font-size: 14px; color: #E7E8E6; }
+  .signin[hidden] { display: none; }
+  .signin button { font: inherit; font-weight: 700; padding: 8px 16px; background: #FFFFFF; color: #111111; border: 0; border-radius: 3px; cursor: pointer; }
+  .signin button:focus-visible { outline: 2px solid #FFFFFF; outline-offset: 2px; }
+  .sync.ready .dot { background: #4ADE80; }
+  .sync.error .dot { background: #FF6B5F; }
+  .sync.error { color: #FF6B5F; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+
+  body.is-loading .kpi .v, body.is-loading .kpi .row span { color: transparent !important; background: #E7E8E6; border-radius: 2px; }
+  body.is-loading .kpi .v { width: 62%; }
+  body.is-loading .kpi.dark .v, body.is-loading .kpi.dark .row span { background: #2A2A2A; }
+  body.is-loading .kpi .row span { min-width: 70px; min-height: 16px; display: inline-block; }
+  body.is-updating .kpis { opacity: .45; transition: opacity .15s; }
+  main { max-width: 1480px; margin: 0 auto; padding: 0 0 48px; }
+
+  .filters { background: var(--panel); display: grid; grid-template-columns: repeat(2, minmax(0, 320px)); gap: 20px; padding: 16px 12px 28px; }
+  .filters label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--ink2); margin-bottom: 3px; letter-spacing: .02em; }
+  .filters select { width: 100%; font: inherit; font-size: 13px; padding: 3px 6px; border: 1px solid var(--ink); background: #fff; border-radius: 0; }
+  .filters select:disabled { color: var(--ink3); border-color: var(--line2); }
+  .filters select:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .caption { font-size: 12.5px; color: var(--ink2); padding: 4px 12px 14px; margin: 0; }
+  .caption b { color: var(--ink); }
+  .empty-state { margin: 0 0 12px; padding: 16px; background: var(--panel); border: 1px solid var(--line); color: var(--ink2); }
+  .office-title { font-size: 30px; font-weight: 800; margin: 22px 12px 4px; }
+  .office-title .sep { color: var(--ink3); font-weight: 500; margin: 0 8px; }
+
+  .kpis { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+  .kpi { background: var(--panel); padding: 22px 16px 16px; min-height: 158px; border: 1px solid var(--line); }
+  .kpi .k { font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink2); }
+  .kpi .v { font-size: 38px; font-weight: 800; line-height: 1.1; margin: 10px 0 14px; letter-spacing: -.01em; }
+  .kpi .row { display: flex; justify-content: space-between; align-items: baseline; font-size: 15px; font-weight: 700; }
+  .kpi .py small { font-size: 12px; font-weight: 500; margin-right: 6px; color: var(--ink2); }
+  .kpi.dark { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .kpi.dark .k { color: #fff; }
+  .kpi.dark .py small { color: #B7B7B2; }
+  .delta.pos { color: var(--good); } .delta.neg { color: var(--bad); }
+  .kpi.dark .delta.pos { color: var(--good-dark); } .kpi.dark .delta.neg { color: var(--bad-dark); }
+  .delta.na { color: var(--ink3); }
+
+  h2.sec { font-size: 30px; font-weight: 800; margin: 26px 12px 2px; }
+  .h2sub { font-size: 12.5px; color: var(--ink2); margin: 0 12px 10px; }
+  .h2sub b { color: var(--ink); }
+  .panel { background: var(--panel); border: 1px solid var(--line); padding: 18px 14px 12px; }
+  .panel h3 { font-size: 16px; margin: 0; font-weight: 700; }
+  .panel .sub { font-size: 12.5px; color: var(--ink2); margin: 2px 0 8px; }
+  body.is-updating .rankings, body.is-updating #chart, body.is-updating .pl { opacity: .45; transition: opacity .15s; }
+
+  .rankings { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .rank-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 10px; margin-bottom: 10px; }
+  .rank-head .pos { font-size: 13px; font-weight: 500; color: var(--ink2); }
+  .rank-head .pos b { color: var(--ink); font-weight: 800; }
+  .rank-head .dot { color: var(--ink3); }
+  .rank-row { display: grid; grid-template-columns: 130px 1fr; align-items: center; gap: 10px; padding: 3px 0; font-size: 13px; }
+  .rank-row .nm { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ink2); }
+  .rank-row.sel .nm { color: var(--ink); font-weight: 700; }
+  .rank-row .bar-cell { display: grid; grid-template-columns: 1fr 76px; align-items: center; gap: 8px; min-width: 0; }
+  .rank-row .track { position: relative; height: 14px; }
+  .rank-row .track.has-neg::before { content: ""; position: absolute; left: var(--zero); top: -3px; bottom: -3px; width: 1px; background: var(--line2); }
+  .rank-row .bar { position: absolute; top: 0; height: 14px; background: #B7B7B2; min-width: 2px; }
+  .rank-row.sel .bar { background: var(--ink); }
+  .rank-row .val { font-size: 12.5px; font-variant-numeric: tabular-nums; color: var(--ink2); white-space: nowrap; }
+  .rank-row.sel .val { color: var(--ink); font-weight: 700; }
+  .rank-row .bar.neg { background: var(--bad); opacity: .55; }
+  .rank-row.sel .bar.neg { opacity: 1; }
+
+  .legend { display: flex; gap: 16px; font-size: 12px; color: var(--ink2); margin-bottom: 4px; }
+  .legend i { display: inline-block; width: 10px; height: 10px; margin-right: 5px; vertical-align: -1px; }
+  #chart { width: 100%; height: auto; display: block; }
+  .chart-box { position: relative; }
+  #chart .bar { cursor: default; }
+  #chart .bar:hover { opacity: .8; }
+  .chart-tip { position: absolute; pointer-events: none; background: var(--ink); color: #fff; padding: 8px 12px; font-size: 12.5px; line-height: 1.4; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,.18); z-index: 2; }
+  .chart-tip[hidden] { display: none; }
+  .chart-tip .t { font-weight: 700; }
+  .chart-tip .v { font-size: 14px; font-weight: 600; }
+  .chart-tip .d.pos { color: var(--good-dark); } .chart-tip .d.neg { color: var(--bad-dark); }
+
+  .pl-wrap { overflow-x: auto; }
+  .pl { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+  .pl th { font-size: 11.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink2); text-align: right; padding: 14px 12px 12px; border-bottom: 1px solid var(--line2); white-space: nowrap; }
+  .pl th:first-child, .pl td:first-child { text-align: left; }
+  .pl td { text-align: right; padding: 8px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  .pl tr.total td { font-weight: 700; background: var(--band); border-bottom: 1px solid var(--line2); }
+  .pl tr.client td:first-child { font-weight: 600; }
+
+  .status { font-size: 12px; color: var(--ink3); margin: 14px 12px 0; }
+  .status.err { color: var(--bad); font-weight: 600; }
+  .source { margin-top: 34px; }
+  .source h2 { font-size: 18px; font-weight: 800; margin: 0 12px 2px; }
+  .source .note { font-size: 12.5px; color: var(--ink2); margin: 0 12px 8px; }
+
+  @media (max-width: 900px) {
+    .filters { grid-template-columns: 1fr 1fr; }
+    .kpis { grid-template-columns: 1fr 1fr; }
+    .kpi .v { font-size: 34px; }
+    .office-title, h2.sec { font-size: 24px; }
+    .rankings { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body class="is-loading">
+<nav class="pnav" aria-label="Portal">
+  <a class="pnav__brand" href="index.html"><span class="pnav__mark">W+K</span><span>Finance Portal</span></a>
+  <div class="pnav__links">
+    <a href="index.html">Home</a>
+    <a href="global-client-portfolio.html">Global Client Portfolio</a>
+    <a href="office-profitability.html" aria-current="page">Office Profitability</a>
+  </div>
+</nav>
+<div class="shell">
+  <div class="brand-label">Wieden+Kennedy</div>
+  <h1>Office Profitability</h1>
+  <div class="sync loading" id="sync" role="status" aria-live="polite"><span class="dot"></span><span id="sync-text">Loading data…</span></div>
+  <div class="signin" id="signin" hidden>
+    <span>Tableau needs you to sign in before the report can load. The sign-in box is in the Tableau view at the bottom of the page.</span>
+    <button type="button" id="signin-btn">Sign in below ↓</button>
+  </div>
+</div>
+<main>
+  <section class="filters">
+    <div><label for="f-year">Accounting Year</label><select id="f-year" disabled></select></div>
+    <div><label for="f-office">Office</label><select id="f-office" disabled></select></div>
+  </section>
+
+  <h1 class="office-title" id="office-title">—</h1>
+  <p class="caption"><b>YTD</b> actuals through <b id="period-label">the latest available month</b>, compared to the <b>same period a year earlier</b>. Currency: <b>USD</b>. Figures sum the selected office and its sub-offices.</p>
+  <p class="empty-state" id="empty-state" hidden>No data for this selection.</p>
+
+  <section class="kpis">
+    <div class="kpi dark" id="k-rev"><div class="k">Revenue</div><div class="v">—</div><div class="row"><span class="py"><small></small><span></span></span><span class="delta"></span></div></div>
+    <div class="kpi" id="k-dc"><div class="k">Direct Contribution</div><div class="v">—</div><div class="row"><span class="py"><small></small><span></span></span><span class="delta"></span></div></div>
+    <div class="kpi" id="k-cm"><div class="k">Contribution Margin</div><div class="v">—</div><div class="row"><span class="py"><small></small><span></span></span><span class="delta"></span></div></div>
+    <div class="kpi" id="k-pr"><div class="k">Profit</div><div class="v">—</div><div class="row"><span class="py"><small></small><span></span></span><span class="delta"></span></div></div>
+    <div class="kpi" id="k-pp"><div class="k">Profit %</div><div class="v">—</div><div class="row"><span class="py"><small></small><span></span></span><span class="delta"></span></div></div>
+  </section>
+
+  <h2 class="sec">Office Performance Ranking</h2>
+  <p class="h2sub">All W+K offices ranked on four metrics, <b>YTD through <span id="rk-cutoff">the latest available month</span></b>. The selected office is highlighted in black. Currency: <b>USD</b>.</p>
+  <section class="rankings" id="rankings"></section>
+  <p class="h2sub" style="margin-top:8px">Each office is the sum of its own leaf offices. Indirect Costs are allocated to offices at different levels, so Profit and Profit % rankings compare offices on a leaf-sum basis and do not add up to the company total.</p>
+
+  <h2 class="sec">Revenue Trends</h2>
+  <p class="h2sub">Monthly <b>revenue by year</b> for the selected office.</p>
+  <div class="panel">
+    <h3>Revenue by Month and Year</h3>
+    <p class="sub">The current year runs through <b id="chart-cutoff">the latest available month</b>; prior year shows <b>all months</b>. Currency: USD.</p>
+    <div class="legend"><span><i style="background:#7B7B74"></i><span id="lg-py">Prior year</span></span><span><i style="background:#111111"></i><span id="lg-cy">Current year</span></span></div>
+    <div class="chart-box">
+      <svg id="chart" viewBox="0 0 1200 330" role="img" aria-label="Revenue by month and year"></svg>
+      <div class="chart-tip" id="chart-tip" hidden></div>
+    </div>
+  </div>
+
+  <h2 class="sec" id="cl-title">Client Contribution</h2>
+  <p class="h2sub">Revenue-to-profit breakdown <b>by client</b> for the selected office. YTD through <b id="pl-cutoff">the latest available month</b>. Currency: <b>USD</b>.</p>
+  <div class="panel">
+    <div class="pl-wrap">
+      <table class="pl" id="pl">
+        <thead><tr><th>Client</th><th>Revenue</th><th>Direct Labour</th><th>Direct Overheads</th><th>Direct Contribution</th><th>Indirect Costs</th><th>Profit</th><th>Profit %</th></tr></thead>
+        <tbody id="pl-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <p class="status err" id="status" hidden></p>
+
+  <section class="source" id="source">
+    <h2>Data source</h2>
+    <p class="note">The Tableau view below feeds everything above. The page reads its data through the Tableau Embedding API and draws the report itself. No Tableau filter is applied: the office selector works inside the page so that the rankings can compare all offices.</p>
+    <tableau-viz id="viz"
+      src="https://prod-useast-a.online.tableau.com/t/wk/views/ProfitabilityPortalData/SRC_CPD_ClientOfficeMonth"
+      width="100%" height="420" toolbar="hidden" hide-tabs iframe-attr-loading="eager">
+    </tableau-viz>
+  </section>
+</main>
+
+<script type="module">
+  const viz = document.getElementById("viz");
+  const statusEl = document.getElementById("status");
+  const yearSel = document.getElementById("f-year");
+  const officeSel = document.getElementById("f-office");
+  const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const MONTH_WORDS = {
+    january:1, jan:1, enero:1, ene:1, february:2, feb:2, febrero:2, march:3, mar:3, marzo:3,
+    april:4, apr:4, abril:4, abr:4, may:5, mayo:5, june:6, jun:6, junio:6, july:7, jul:7, julio:7,
+    august:8, aug:8, agosto:8, ago:8, september:9, sep:9, sept:9, septiembre:9, setiembre:9,
+    october:10, oct:10, octubre:10, november:11, nov:11, noviembre:11, december:12, dec:12, diciembre:12, dic:12
+  };
+  const DEFAULT_OFFICE = "New York";
+
+  // One fact per year x month x client x parent office, leaf rows only (the WKI root row is excluded:
+  // an office's figures are the sum of its own leaf offices, as in the Tableau report).
+  let facts = [];
+  let reading = false, rerun = false, timer = null;
+
+  const syncEl = document.getElementById("sync");
+  const syncText = document.getElementById("sync-text");
+  let loaded = false;
+  let lastSync = "";
+
+  function setState(state, text, detail) {
+    syncEl.className = "sync " + state;
+    syncText.textContent = text;
+    syncEl.title = detail || "";
+    if (state === "ready" || state === "error" || state === "cached") document.body.classList.remove("is-loading");
+    document.body.classList.toggle("is-updating", state === "updating");
+    statusEl.hidden = state !== "error";
+    statusEl.textContent = state === "error" ? detail || text : "";
+  }
+  function busyState() {
+    if (fromCache) return ["cached", "Saved data from " + lastSync + " · Updating…"];
+    return loaded ? ["updating", "Updating…"] : ["loading", "Loading data…"];
+  }
+
+  // ---------- local cache (IndexedDB): paint the last read instantly, refresh from Tableau in the background ----------
+  const CACHE_KEY = "office-profitability-facts-v1";
+  let fromCache = false;
+  function idb() {
+    return new Promise((res, rej) => {
+      const r = indexedDB.open("wk-finance-portal", 1);
+      r.onupgradeneeded = () => r.result.createObjectStore("cache");
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+    });
+  }
+  async function cacheGet() {
+    try {
+      const db = await idb();
+      return await new Promise((res, rej) => {
+        const q = db.transaction("cache").objectStore("cache").get(CACHE_KEY);
+        q.onsuccess = () => res(q.result || null);
+        q.onerror = () => rej(q.error);
+      });
+    } catch (_) { return null; }
+  }
+  async function cachePut(v) {
+    try {
+      const db = await idb();
+      await new Promise((res, rej) => {
+        const t = db.transaction("cache", "readwrite");
+        t.objectStore("cache").put(v, CACHE_KEY);
+        t.oncomplete = res;
+        t.onerror = () => rej(t.error);
+      });
+    } catch (_) {}
+  }
+  function errText(e) { return e && e.message ? e.message : String(e); }
+  function sheet() {
+    const s = viz.workbook.activeSheet;
+    return s.sheetType === "worksheet" ? s : (s.worksheets && s.worksheets[0]) || null;
+  }
+
+  // ---------- data shape ----------
+  function toNum(v) {
+    if (typeof v === "number") return v;
+    if (typeof v === "string" && v.trim() !== "" && !isNaN(Number(v))) return Number(v);
+    return null;
+  }
+  function monthOf(cell) {
+    const n = toNum(cell.value);
+    if (n !== null && Number.isInteger(n) && n >= 1 && n <= 12) return n;
+    for (const s of [cell.value, cell.formattedValue]) {
+      if (typeof s === "string") {
+        const m = MONTH_WORDS[s.trim().toLowerCase().replace(/\./g, "")];
+        if (m) return m;
+      }
+    }
+    return null;
+  }
+  // SRC_CPD_ClientOfficeMonth carries each measure as _USD and _Local; the page is USD-only.
+  function kindOf(name) {
+    const s = String(name || "").trim().toLowerCase();
+    return { revenue_usd: "rev", directlabour_usd: "dl", directoverheads_usd: "dov",
+             directcontribution_usd: "dc", indirectcosts_usd: "ind" }[s] || null;
+  }
+
+  function parse(table) {
+    const cols = table.columns, rows = table.data;
+    if (!rows.length) return [];
+    const names = cols.map(c => c.fieldName.trim());
+    const find = re => names.findIndex(n => re.test(n));
+    const mn = find(/^(measure names|nombres de medidas)$/i);
+    const mv = find(/^(measure values|valores de medidas)$/i);
+    const ai = find(/^abstract$/i);
+    const ci = find(/^reportingclient/i);
+    const pi = find(/^parent\s*office/i);
+    let yi = -1, mi = -1;
+    cols.forEach((c, i) => {
+      if (yi >= 0 || i === mn || i === mv) return;
+      if (rows.every(r => { const n = toNum(r[i].value); return n !== null && n >= 1900 && n <= 2100; })) yi = i;
+    });
+    cols.forEach((c, i) => {
+      if (mi >= 0 || i === mn || i === mv || i === yi) return;
+      if (rows.every(r => monthOf(r[i]) !== null)) mi = i;
+    });
+    if (yi < 0 || mi < 0 || ai < 0 || ci < 0 || pi < 0) throw new Error("Unexpected data shape. Columns: " + names.join(" · "));
+    const isLeaf = r => { const v = r[ai].value; return v === false || /^(false|falso)$/i.test(String(v)); };
+
+    const map = new Map();
+    const fact = r => {
+      const y = toNum(r[yi].value), m = monthOf(r[mi]), client = r[ci].formattedValue, office = r[pi].formattedValue;
+      const k = [y, m, client, office].join("|");
+      if (!map.has(k)) map.set(k, { y, m, client, office, rev: 0, dl: 0, dov: 0, dc: 0, ind: 0 });
+      return map.get(k);
+    };
+    if (mn >= 0 && mv >= 0) {
+      rows.filter(isLeaf).forEach(r => {
+        const k = kindOf(r[mn].value) || kindOf(r[mn].formattedValue);
+        const v = toNum(r[mv].value);
+        if (k && v !== null) fact(r)[k] += v;
+      });
+    } else {
+      const ms = cols.map((c, i) => ({ i, k: kindOf(c.fieldName) })).filter(x => x.k);
+      if (!ms.length) throw new Error("No Revenue/Direct Contribution columns found. Columns: " + names.join(" · "));
+      rows.filter(isLeaf).forEach(r => { const f = fact(r); ms.forEach(({ i, k }) => { const v = toNum(r[i].value); if (v !== null) f[k] += v; }); });
+    }
+    return [...map.values()];
+  }
+
+  // ---------- reading ----------
+  function refresh() { clearTimeout(timer); timer = setTimeout(readNow, 120); }
+
+  async function readNow() {
+    if (reading) { rerun = true; return; }
+    reading = true;
+    setState(...busyState());
+    let reader;
+    try {
+      const t0 = performance.now();
+      reader = await sheet().getSummaryDataReaderAsync();
+      const table = await reader.getAllPagesAsync();
+      const ms = Math.round(performance.now() - t0);
+      facts = parse(table);
+      fillSelectors();
+      render();
+      loaded = true;
+      lastSync = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+      fromCache = false;
+      cachePut({ facts, time: lastSync });
+      setState("ready", "Ready · Read from Tableau at " + lastSync,
+        table.data.length + " rows read in " + ms + " ms");
+    } catch (e) {
+      setState("error", "Error", "Could not read data from Tableau: " + errText(e));
+    } finally {
+      if (reader) { try { await reader.releaseAsync(); } catch (_) {} }
+      reading = false;
+      if (rerun) { rerun = false; refresh(); }
+    }
+  }
+
+  // ---------- selectors (in-page; no Tableau filter is applied) ----------
+  function fill(sel, values, keep) {
+    sel.replaceChildren();
+    values.forEach(v => { const o = document.createElement("option"); o.value = v; o.textContent = v; sel.appendChild(o); });
+    if (keep && values.map(String).includes(String(keep))) sel.value = keep;
+    sel.disabled = values.length === 0;
+  }
+  function fillSelectors() {
+    const years = [...new Set(facts.filter(f => f.rev !== 0).map(f => f.y))].sort((a, b) => b - a);
+    fill(yearSel, years, yearSel.value);
+    const offices = [...new Set(facts.map(f => f.office).filter(o => o && String(o).trim() !== ""))]
+      .sort((a, b) => String(a).localeCompare(String(b)));
+    fill(officeSel, offices, officeSel.value || (offices.includes(DEFAULT_OFFICE) ? DEFAULT_OFFICE : offices[0]));
+  }
+  yearSel.addEventListener("change", render);
+  officeSel.addEventListener("change", render);
+
+  // ---------- KPIs ----------
+  function fmtMoney(v) {
+    if (v === null || !isFinite(v)) return "—";
+    const a = Math.abs(v), sign = v < 0 ? "-" : "";
+    if (a >= 1e9) return sign + "$" + (a / 1e9).toFixed(1) + "B";
+    if (a >= 1e6) return sign + "$" + (a / 1e6).toFixed(1) + "M";
+    if (a >= 1e3) return sign + "$" + (a / 1e3).toFixed(1) + "K";
+    return sign + "$" + a.toFixed(0);
+  }
+  function fmtPct(v) { return v === null || !isFinite(v) ? "—" : (v * 100).toFixed(1) + "%"; }
+  function pctDelta(cy, py) { return py ? (cy - py) / Math.abs(py) : null; }
+  function signed(v, digits, suffix) { return (v >= 0 ? "+" : "") + v.toFixed(digits) + suffix; }
+
+  // YTD sums for one office (leaf offices under the selected parent), plus the count of active clients.
+  function officeSums(office, year, cutoff) {
+    const s = { rev: 0, dc: 0, ind: 0 }, byClient = new Map();
+    let any = false;
+    for (const f of facts) {
+      if (f.office !== office || f.y !== year || f.m > cutoff) continue;
+      s.rev += f.rev; s.dc += f.dc; s.ind += f.ind; any = true;
+      byClient.set(f.client, (byClient.get(f.client) || 0) + f.rev);
+    }
+    if (!any) return null;
+    const profit = s.dc - s.ind;
+    return {
+      rev: s.rev, dc: s.dc, cm: s.rev ? s.dc / s.rev : null,
+      profit, pp: s.rev ? profit / s.rev : null,
+      clients: [...byClient.entries()].filter(([c, v]) => c && String(c).trim() !== "" && v > 0).length
+    };
+  }
+
+  function setKpi(id, value, pyYear, pyValue, delta, deltaText) {
+    const el = document.getElementById(id);
+    el.querySelector(".v").textContent = value;
+    el.querySelector(".py small").textContent = pyYear;
+    el.querySelector(".py span").textContent = pyValue;
+    const d = el.querySelector(".delta");
+    d.textContent = deltaText;
+    d.className = "delta " + (delta === null ? "na" : delta >= 0 ? "pos" : "neg");
+  }
+
+  function render() {
+    const cyYear = Number(yearSel.value), office = officeSel.value;
+    const titleEl = document.getElementById("office-title");
+    document.getElementById("empty-state").hidden = !!cyYear && !!office;
+    if (!cyYear || !office) {
+      for (const id of ["k-rev", "k-dc", "k-cm", "k-pr", "k-pp"]) setKpi(id, "—", "", "", null, "n/a");
+      titleEl.textContent = "—";
+      document.getElementById("period-label").textContent = "the latest available month";
+      for (const id of ["rankings", "chart", "pl-body"]) document.getElementById(id).replaceChildren();
+      return;
+    }
+    // Cutoff = last month with revenue in the current year across all offices, so every office shares one period.
+    const cyMonths = facts.filter(f => f.y === cyYear && f.rev !== 0).map(f => f.m);
+    const cutoff = cyMonths.length ? Math.max(...cyMonths) : 12;
+    document.getElementById("period-label").textContent = cyMonths.length ? MONTHS[cutoff - 1] + " " + cyYear : "the latest available month";
+    const pyYear = cyYear - 1;
+    const cy = officeSums(office, cyYear, cutoff), py = officeSums(office, pyYear, cutoff);
+
+    const sep = '<span class="sep">·</span>';
+    titleEl.innerHTML = "";
+    const name = document.createElement("span"); name.textContent = office.toUpperCase();
+    const rest = document.createElement("span");
+    rest.innerHTML = sep + cyYear + sep;
+    const ac = document.createElement("span"); ac.textContent = (cy ? cy.clients : 0) + " Active Clients";
+    titleEl.append(name, rest, ac);
+
+    const dRev = cy && py ? pctDelta(cy.rev, py.rev) : null;
+    const dDc = cy && py ? pctDelta(cy.dc, py.dc) : null;
+    const dCm = cy && py && cy.cm !== null && py.cm !== null ? (cy.cm - py.cm) * 10000 : null;
+    const dPr = cy && py ? pctDelta(cy.profit, py.profit) : null;
+    const dPp = cy && py && cy.pp !== null && py.pp !== null ? (cy.pp - py.pp) * 10000 : null;
+    const pyL = py ? pyYear : "";
+    setKpi("k-rev", fmtMoney(cy ? cy.rev : null), pyL, py ? fmtMoney(py.rev) : "", dRev, dRev === null ? "n/a" : signed(dRev * 100, 1, "%"));
+    setKpi("k-dc", fmtMoney(cy ? cy.dc : null), pyL, py ? fmtMoney(py.dc) : "", dDc, dDc === null ? "n/a" : signed(dDc * 100, 1, "%"));
+    setKpi("k-cm", fmtPct(cy ? cy.cm : null), pyL, py ? fmtPct(py.cm) : "", dCm, dCm === null ? "n/a" : signed(dCm, 0, " bps"));
+    setKpi("k-pr", fmtMoney(cy ? cy.profit : null), pyL, py ? fmtMoney(py.profit) : "", dPr, dPr === null ? "n/a" : signed(dPr * 100, 1, "%"));
+    setKpi("k-pp", fmtPct(cy ? cy.pp : null), pyL, py ? fmtPct(py.pp) : "", dPp, dPp === null ? "n/a" : signed(dPp, 0, " bps"));
+
+    const cutoffLabel = cyMonths.length ? MONTHS[cutoff - 1] + " " + cyYear : "the latest available month";
+    for (const id of ["rk-cutoff", "chart-cutoff", "pl-cutoff"]) document.getElementById(id).textContent = cutoffLabel;
+    document.getElementById("lg-py").textContent = pyYear;
+    document.getElementById("lg-cy").textContent = cyYear;
+    document.getElementById("cl-title").textContent = "Client Contribution: " + office;
+    drawRankings(office, cyYear, cutoff);
+    drawChart(office, cyYear, pyYear, cutoff);
+    drawClients(office, cyYear, cutoff);
+  }
+
+  // ---------- rankings ----------
+  const RANKS = [
+    { title: "Revenue", get: s => s.rev, fmt: fmtMoney },
+    { title: "Direct Contribution", get: s => s.dc, fmt: fmtMoney },
+    { title: "Profit", get: s => s.profit, fmt: fmtMoney },
+    { title: "Profit %", get: s => s.pp, fmt: fmtPct },
+  ];
+  function drawRankings(selected, year, cutoff) {
+    // Every office with revenue in the period, each on its own leaf-sum.
+    const all = [...new Set(facts.map(f => f.office).filter(o => o && String(o).trim() !== ""))]
+      .map(o => ({ office: o, s: officeSums(o, year, cutoff) }))
+      .filter(x => x.s && x.s.rev > 0);
+    const host = document.getElementById("rankings");
+    const frag = document.createDocumentFragment();
+    for (const r of RANKS) {
+      const rows = all.map(x => ({ office: x.office, v: r.get(x.s) })).filter(x => x.v !== null && isFinite(x.v))
+        .sort((a, b) => b.v - a.v);
+      // Zero axis: positive bars grow right of it, negative bars grow left of it.
+      const maxPos = Math.max(0, ...rows.map(x => x.v));
+      const maxNeg = Math.max(0, ...rows.map(x => -x.v));
+      const range = (maxPos + maxNeg) || 1;
+      const zero = maxNeg / range * 100;
+      const panel = document.createElement("article"); panel.className = "panel";
+      const head = document.createElement("div"); head.className = "rank-head";
+      const h = document.createElement("h3"); h.textContent = r.title;
+      const dot = document.createElement("span"); dot.className = "dot"; dot.textContent = "·";
+      const info = document.createElement("span"); info.className = "pos";
+      const pos = rows.findIndex(x => x.office === selected) + 1;
+      if (pos) {
+        const b = document.createElement("b"); b.textContent = "#" + pos + " of " + rows.length;
+        info.append(selected + " ranks ", b);
+      } else info.textContent = selected + " has no revenue in this period";
+      head.append(h, dot, info); panel.appendChild(head);
+      rows.forEach(x => {
+        const row = document.createElement("div"); row.className = "rank-row" + (x.office === selected ? " sel" : "");
+        const nm = document.createElement("span"); nm.className = "nm"; nm.textContent = x.office; nm.title = x.office;
+        const cell = document.createElement("span"); cell.className = "bar-cell";
+        const track = document.createElement("span"); track.className = "track" + (maxNeg > 0 ? " has-neg" : "");
+        track.style.setProperty("--zero", zero.toFixed(2) + "%");
+        const bar = document.createElement("span"); bar.className = "bar" + (x.v < 0 ? " neg" : "");
+        const w = Math.abs(x.v) / range * 100;
+        bar.style.width = w.toFixed(2) + "%";
+        bar.style.left = (x.v < 0 ? zero - w : zero).toFixed(2) + "%";
+        track.appendChild(bar);
+        const val = document.createElement("span"); val.className = "val"; val.textContent = r.fmt(x.v);
+        cell.append(track, val); row.append(nm, cell); panel.appendChild(row);
+      });
+      frag.appendChild(panel);
+    }
+    host.replaceChildren(frag);
+  }
+
+  // ---------- client table ----------
+  function fmtUsd(v) {
+    if (v === null || !isFinite(v)) return "—";
+    return (v < 0 ? "-$" : "$") + Math.round(Math.abs(v)).toLocaleString("en-US");
+  }
+  function plRow(label) { return { label, rev: 0, dl: 0, dov: 0, dc: 0, ind: 0 }; }
+  function drawClients(office, year, cutoff) {
+    const byClient = new Map(), total = plRow("Grand Total");
+    for (const f of facts) {
+      if (f.office !== office || f.y !== year || f.m > cutoff) continue;
+      const name = f.client && String(f.client).trim() !== "" ? f.client : "(No client)";
+      if (!byClient.has(name)) byClient.set(name, plRow(name));
+      for (const t of [byClient.get(name), total]) for (const k of ["rev", "dl", "dov", "dc", "ind"]) t[k] += f[k];
+    }
+    const list = [...byClient.values()].sort((a, b) => b.rev - a.rev);
+    const cells = r => { const p = r.dc - r.ind;
+      return [fmtUsd(r.rev), fmtUsd(r.dl), fmtUsd(r.dov), fmtUsd(r.dc), fmtUsd(r.ind), fmtUsd(p), Math.abs(r.rev) < 1 ? "—" : fmtPct(p / r.rev)]; };
+    const tr = (cls, label, vals) => {
+      const row = document.createElement("tr"); row.className = cls;
+      const td = document.createElement("td"); td.textContent = label; row.appendChild(td);
+      vals.forEach(v => { const c = document.createElement("td"); c.textContent = v; row.appendChild(c); });
+      return row;
+    };
+    const frag = document.createDocumentFragment();
+    if (list.length) frag.appendChild(tr("total", "Grand Total", cells(total)));
+    list.forEach(c => frag.appendChild(tr("client", c.label, cells(c))));
+    document.getElementById("pl-body").replaceChildren(frag);
+  }
+
+  // ---------- monthly chart ----------
+  const NS = "http://www.w3.org/2000/svg";
+  function el(tag, attrs, text) {
+    const n = document.createElementNS(NS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (text !== undefined) n.textContent = text;
+    return n;
+  }
+  function niceStep(max) {
+    const raw = max / 4, p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p;
+    return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * p;
+  }
+  const tip = document.getElementById("chart-tip");
+  function showTip(title, value, delta, d) {
+    tip.replaceChildren();
+    const t = document.createElement("div"); t.className = "t"; t.textContent = title;
+    const v = document.createElement("div"); v.className = "v"; v.textContent = "Revenue " + value;
+    tip.append(t, v);
+    if (delta) { const x = document.createElement("div"); x.className = "d " + (d >= 0 ? "pos" : "neg"); x.textContent = delta; tip.appendChild(x); }
+    tip.hidden = false;
+  }
+  function moveTip(e) {
+    const box = tip.parentElement.getBoundingClientRect();
+    let x = e.clientX - box.left + 14, yy = e.clientY - box.top - 12;
+    if (x + tip.offsetWidth > box.width - 8) x = e.clientX - box.left - tip.offsetWidth - 14;
+    tip.style.left = x + "px"; tip.style.top = Math.max(0, yy - tip.offsetHeight) + "px";
+  }
+  function hideTip() { tip.hidden = true; }
+
+  function drawChart(office, cyYear, pyYear, cutoff) {
+    const svg = document.getElementById("chart");
+    svg.replaceChildren();
+    const W = 1200, H = 330, L = 64, R = 8, T = 14, B = 30;
+    const pw = W - L - R, ph = H - T - B, gw = pw / 12;
+    const rev = new Map();
+    for (const f of facts) if (f.office === office) { const k = f.y * 100 + f.m; rev.set(k, (rev.get(k) || 0) + f.rev); }
+    const get = (y, m) => rev.has(y * 100 + m) ? rev.get(y * 100 + m) : null;
+    const vals = [];
+    for (let m = 1; m <= 12; m++) { const a = get(pyYear, m), b = m <= cutoff ? get(cyYear, m) : null; if (a !== null) vals.push(a); if (b !== null) vals.push(b); }
+    const max = Math.max(0, ...vals);
+    const step = max > 0 ? niceStep(max) : 1;
+    const top = max > 0 ? Math.ceil(max / step) * step : 1;
+    const y = v => T + ph - (Math.max(0, v) / top) * ph;
+    for (let t = 0; t <= top + 1e-9; t += step) {
+      svg.appendChild(el("text", { x: L - 10, y: y(t) + 4, "text-anchor": "end", "font-size": 12, fill: "#7B7B74" }, fmtMoney(t)));
+    }
+    for (let m = 1; m <= 12; m++) {
+      const gx = L + (m - 1) * gw;
+      if (m > 1) svg.appendChild(el("line", { x1: gx, x2: gx, y1: T, y2: T + ph, stroke: "#DDDDDA", "stroke-width": 1 }));
+      svg.appendChild(el("text", { x: gx + gw / 2, y: T + ph + 22, "text-anchor": "middle", "font-size": 13, "font-weight": 600, fill: "#111111" }, MONTHS[m - 1]));
+      const bw = gw * 0.27;
+      const pyV = get(pyYear, m), cyV = m <= cutoff ? get(cyYear, m) : null;
+      const bars = [[pyYear, pyV, gx + gw * 0.17, "#7B7B74", null], [cyYear, cyV, gx + gw * 0.56, "#111111", pyV]];
+      for (const [yr, v, x, c, cmp] of bars) {
+        if (v === null) continue;
+        const r = el("rect", { x, y: y(v), width: bw, height: Math.max(0, T + ph - y(v)), fill: c, class: "bar" });
+        const d = cmp !== null ? pctDelta(v, cmp) : null;
+        r.addEventListener("mouseenter", () => showTip(MONTHS[m - 1] + " " + yr, fmtMoney(v),
+          d === null ? "" : "vs " + pyYear + ": " + signed(d * 100, 1, "%"), d));
+        r.addEventListener("mousemove", moveTip);
+        r.addEventListener("mouseleave", hideTip);
+        svg.appendChild(r);
+      }
+    }
+    svg.appendChild(el("line", { x1: L, x2: W - R, y1: T + ph, y2: T + ph, stroke: "#C9C9C3", "stroke-width": 1 }));
+  }
+
+  // ---------- wiring ----------
+  const signinEl = document.getElementById("signin");
+  let interactive = false;
+  // Tableau shows its sign-in inside the embed; if it hasn't loaded after 5 s, point the viewer to it.
+  const signinTimer = setTimeout(() => {
+    if (interactive) return;
+    setState("signin", "Sign in to Tableau to load data");
+    signinEl.hidden = false;
+  }, 5000);
+  document.getElementById("signin-btn").addEventListener("click", () =>
+    document.getElementById("source").scrollIntoView({ behavior: "smooth", block: "start" }));
+
+  viz.addEventListener("firstinteractive", () => {
+    interactive = true;
+    clearTimeout(signinTimer);
+    signinEl.hidden = true;
+    if (!loaded) setState("loading", "Loading data…");
+    refresh();
+  });
+  (async () => {
+    const c = await cacheGet();
+    if (loaded || !c || !Array.isArray(c.facts) || !c.facts.length) return;
+    try {
+      facts = c.facts;
+      fillSelectors();
+      render();
+    } catch (_) { facts = []; return; }
+    fromCache = true;
+    loaded = true;
+    lastSync = c.time;
+    setState("cached", "Saved data from " + lastSync + " · Updating…", facts.length + " fact rows from the local cache");
+  })();
+  viz.addEventListener("vizloaderror", e => setState("error", "Error",
+    "Could not load the Tableau view: " + (e.detail && e.detail.message ? e.detail.message : "no detail")));
+</script>
+</body>
+</html>
