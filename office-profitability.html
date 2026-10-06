@@ -117,6 +117,11 @@
   .pl { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
   .pl th { font-size: 11.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink2); text-align: right; padding: 14px 12px 12px; border-bottom: 1px solid var(--line2); white-space: nowrap; }
   .pl th:first-child, .pl td:first-child { text-align: left; }
+  .pl th button { font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+  .pl th button:hover, .pl th[aria-sort] button { color: var(--ink); }
+  .pl th button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .pl th[aria-sort="ascending"] button::after { content: " \25B4"; }
+  .pl th[aria-sort="descending"] button::after { content: " \25BE"; }
   .pl td { text-align: right; padding: 8px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
   .pl tr.total td { font-weight: 700; background: var(--band); border-bottom: 1px solid var(--line2); }
   .pl tr.client td:first-child { font-weight: 600; }
@@ -194,7 +199,7 @@
   <div class="panel">
     <div class="pl-wrap">
       <table class="pl" id="pl">
-        <thead><tr><th>Client</th><th>Revenue</th><th>Direct Labour</th><th>Direct Overheads</th><th>Direct Contribution</th><th>Indirect Costs</th><th>Profit</th><th>Profit %</th></tr></thead>
+        <thead><tr><th data-k="label"><button type="button">Client</button></th><th data-k="rev"><button type="button">Revenue</button></th><th data-k="dl"><button type="button">Direct Labour</button></th><th data-k="dov"><button type="button">Direct Overheads</button></th><th data-k="dc"><button type="button">Direct Contribution</button></th><th data-k="ind"><button type="button">Indirect Costs</button></th><th data-k="profit"><button type="button">Profit</button></th><th data-k="pct"><button type="button">Profit %</button></th></tr></thead>
         <tbody id="pl-body"></tbody>
       </table>
     </div>
@@ -554,11 +559,30 @@
   // Default order: Revenue, then Direct Contribution, Profit and Profit % as tie-breakers (all descending); "(No client)" last.
   const desc = (x, y) => x === y ? 0 : x > y ? -1 : 1;
   const profitPct = r => Math.abs(r.rev) < 1 ? -Infinity : (r.dc - r.ind) / r.rev;
+  // Column sort on header click: natural order first (Client A-Z, numbers high to low), second click reverses, third resets to default.
+  const SORT_VAL = { rev: r => r.rev, dl: r => r.dl, dov: r => r.dov, dc: r => r.dc, ind: r => r.ind, profit: r => r.dc - r.ind, pct: profitPct };
+  let plSort = null, plArgs = null;
   function plOrder(a, b) {
     if ((a.label === NO_CLIENT) !== (b.label === NO_CLIENT)) return a.label === NO_CLIENT ? 1 : -1;
+    if (plSort) {
+      const c = plSort.key === "label" ? String(a.label).localeCompare(String(b.label)) : desc(SORT_VAL[plSort.key](a), SORT_VAL[plSort.key](b));
+      if (c) return c * plSort.dir;
+    }
     return desc(a.rev, b.rev) || desc(a.dc, b.dc) || desc(a.dc - a.ind, b.dc - b.ind) || desc(profitPct(a), profitPct(b));
   }
+  document.querySelector("#pl thead").addEventListener("click", e => {
+    const th = e.target.closest("th[data-k]");
+    if (!th) return;
+    const k = th.dataset.k;
+    plSort = !plSort || plSort.key !== k ? { key: k, dir: 1 } : plSort.dir === 1 ? { key: k, dir: -1 } : null;
+    document.querySelectorAll("#pl thead th").forEach(h => {
+      if (plSort && h.dataset.k === plSort.key) h.setAttribute("aria-sort", (plSort.key === "label") === (plSort.dir === 1) ? "ascending" : "descending");
+      else h.removeAttribute("aria-sort");
+    });
+    if (plArgs) drawClients(...plArgs);
+  });
   function drawClients(office, year, cutoff) {
+    plArgs = [office, year, cutoff];
     const byClient = new Map(), total = plRow("Grand Total");
     for (const f of facts) {
       if (f.office !== office || f.y !== year || f.m > cutoff) continue;
