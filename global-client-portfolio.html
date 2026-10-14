@@ -55,13 +55,43 @@
   body.is-loading #chart { display: none; }
   main { max-width: 1480px; margin: 0 auto; padding: 0 0 48px; }
 
-  .filters { background: var(--panel); display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 16px 12px 28px; }
+  .filters { position: sticky; top: var(--nav-h, 68px); z-index: 190; border-bottom: 1px solid var(--line); background: var(--panel); display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 28px 12px 16px; }
   .filters label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--ink2); margin-bottom: 3px; letter-spacing: .02em; }
-  .filters select { width: 100%; font: inherit; font-size: 13px; padding: 3px 6px; border: 1px solid var(--ink); background: #fff; border-radius: 0; }
-  .filters select:disabled { color: var(--ink3); border-color: var(--line2); }
+  .filters { --chev: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23111111' stroke-width='2'/%3E%3C/svg%3E"); --chev-off: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%237B7B74' stroke-width='2'/%3E%3C/svg%3E"); }
+  .filters select { width: 100%; min-height: 26px; font: inherit; font-size: 13px; padding: 3px 26px 3px 6px; border: 1px solid var(--ink); background: #fff var(--chev) no-repeat right 9px center / 12px 8px; border-radius: 0; appearance: none; -webkit-appearance: none; }
+  .filters select:disabled { color: var(--ink3); border-color: var(--line2); background-image: var(--chev-off); }
   .filters select:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .sync-mini { position: absolute; left: 12px; top: 7px; display: none; align-items: center; gap: 7px; max-width: calc(100% - 24px); font-size: 12px; font-weight: 600; color: var(--ink2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  body.sync-hidden .sync-mini { display: flex; }
+  .sync-mini .dot { width: 8px; height: 8px; border-radius: 50%; background: #A6A6A0; flex: none; }
+  .sync-mini.loading .dot, .sync-mini.updating .dot, .sync-mini.signin .dot, .sync-mini.cached .dot { background: #FF6B5F; animation: pulse .8s ease-in-out infinite; }
+  .sync-mini.ready .dot { background: #4ADE80; }
+  .sync-mini.error .dot, .sync-mini.error { background: none; color: var(--bad); }
+  .sync-mini.error .dot { background: var(--bad); }
+  .combo-foot { padding: 6px 8px; border-top: 1px solid var(--line2); background: #fff; }
+  .apply-btn { width: 100%; min-height: 28px; padding: 3px 14px; font: inherit; font-size: 13px; font-weight: 600; color: var(--ink3); background: #fff; border: 1px solid var(--line2); border-radius: 0; cursor: default; }
+  .apply-btn.pending { color: #fff; background: var(--ink); border-color: var(--ink); cursor: pointer; }
+  .apply-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .combo-list li::before { content: ""; display: inline-block; box-sizing: border-box; width: 17px; height: 17px; margin-right: 8px; vertical-align: -3px; border: 1.5px solid var(--ink); background: #fff no-repeat center / 13px 13px; }
+  .combo-list li[aria-selected="true"]::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6.5l3 3 5-7' fill='none' stroke='%23111111' stroke-width='1.2'/%3E%3C/svg%3E"); }
+  .combo-list li.none::before { display: none; }  .combo { position: relative; }
+  .combo-btn { position: relative; width: 100%; min-height: 26px; padding: 3px 26px 3px 6px; font: inherit; font-size: 13px; color: var(--ink); text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: #fff var(--chev) no-repeat right 9px center / 12px 8px; border: 1px solid var(--ink); border-radius: 0; cursor: pointer; }
+  .combo-btn:disabled { color: var(--ink3); border-color: var(--line2); background-image: var(--chev-off); cursor: default; }
+  .combo-btn:focus-visible, .combo-search:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .combo-panel { position: absolute; z-index: 150; left: 0; right: 0; top: 100%; margin-top: 2px; background: #fff; border: 1px solid var(--ink); box-shadow: 0 2px 8px rgba(0,0,0,.18); }
+  .combo-panel[hidden] { display: none; }
+  .combo-search { display: block; width: 100%; padding: 6px 8px; font: inherit; font-size: 13px; background: #fff; border: 0; border-bottom: 1px solid var(--line2); border-radius: 0; }
+  .combo-list { list-style: none; margin: 0; padding: 0; max-height: 260px; overflow-y: auto; }
+  .combo-list li { padding: 5px 8px; font-size: 13px; cursor: pointer; }
+  .combo-list li.active { background: #E7E8E6; }
+  .combo-list li[aria-selected="true"] { font-weight: 700; }
+  .combo-list li.none { color: var(--ink3); cursor: default; }
   .caption { font-size: 12.5px; color: var(--ink2); padding: 14px 12px 10px; }
   .caption b { color: var(--ink); }
+  .period { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; margin: 14px 12px 12px; padding: 7px 14px; border: 1px solid var(--ink); border-radius: 999px; background: var(--panel); font-size: 14px; }
+  .period[hidden] { display: none; }
+  .period .mode { font-weight: 800; letter-spacing: .06em; text-transform: uppercase; font-size: 12px; background: var(--ink); color: #fff; padding: 3px 9px; border-radius: 999px; }
+  .period .vs { color: var(--ink3); }
   .empty-state { margin: 0 0 12px; padding: 16px; background: var(--panel); border: 1px solid var(--line); color: var(--ink2); }
 
   .kpis { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
@@ -114,8 +144,18 @@
   .pl .tog[aria-expanded="true"]::before { transform: rotate(90deg); }
   .pl .tog:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
   .pl .spacer { display: inline-block; width: 16px; }
+  .info-btn { margin-left: 6px; width: 16px; height: 16px; padding: 0; border: 1px solid var(--ink3); border-radius: 50%; background: none; color: var(--ink2); font: 700 11px/1 "Archivo", system-ui, sans-serif; cursor: pointer; vertical-align: 1px; }
+  .info-btn:hover, .info-btn[aria-expanded="true"] { border-color: var(--ink); background: var(--ink); color: #fff; }
+  .info-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .info-pop { position: fixed; z-index: 200; max-width: 300px; background: var(--ink); color: #fff; padding: 8px 12px; font-size: 12.5px; font-weight: 400; line-height: 1.4; text-align: left; white-space: normal; box-shadow: 0 2px 8px rgba(0,0,0,.18); }
+  .info-pop[hidden] { display: none; }
   body.is-updating .pl { opacity: .45; transition: opacity .15s; }
-  .pl-note { font-size: 12px; color: var(--ink2); margin: 10px 2px 0; }
+  .pl-note.kpi-intro { margin: 14px 12px 12px; }
+  .kpi-intro .period { margin: 0 0 10px; border-color: var(--line2); }
+  .kpi-intro p { margin: 0; }
+  .pl-note ul { margin: 6px 0 0; padding-left: 18px; }
+  .pl-note li { margin: 3px 0; }
+  .pl-note { font-size: 13px; color: var(--ink); margin: 0 0 12px; padding: 8px 12px; border: 1px solid var(--line); border-left: 3px solid var(--ink2); background: var(--panel); }
 
   .status { font-size: 12px; color: var(--ink3); margin: 14px 12px 0; }
   .status.err { color: var(--bad); font-weight: 600; }
@@ -150,15 +190,19 @@
 </div>
 <main>
   <section class="filters">
+    <div class="sync-mini loading" id="sync-mini" aria-hidden="true"><span class="dot"></span><span id="sync-mini-text">Loading data…</span></div>
     <div><label for="f-year">Accounting Year</label><select id="f-year" disabled></select></div>
     <div><label for="f-country">Country</label><select id="f-country" disabled><option>(All)</option></select></div>
     <div><label for="f-client">Reporting Client</label><select id="f-client" disabled><option>(All)</option></select></div>
     <div><label for="f-office">Office</label><select id="f-office" disabled><option>(All)</option></select></div>
   </section>
 
-  <p class="caption"><b>YTD</b> actuals through <b id="period-label">the latest available month</b>, compared to the <b>same period a year earlier</b>. Currency: <b>USD</b>.</p>
   <p class="empty-state" id="empty-state" hidden>No data for this selection.</p>
 
+  <div class="pl-note kpi-intro">
+    <div class="period" id="period-pill" hidden></div>
+    <p><strong>Profit and Profit %</strong> use company-level Indirect Costs. With a Country or Office filter, they use the selected offices only.</p>
+  </div>
   <section class="kpis">
     <div class="kpi dark" id="k-rev"><div class="k">Revenue</div><div class="v">—</div><div class="row"><span class="py"><small></small><span></span></span><span class="delta"></span></div></div>
     <div class="kpi" id="k-dc"><div class="k">Direct Contribution</div><div class="v">—</div><div class="row"><span class="py"><small></small><span></span></span><span class="delta"></span></div></div>
@@ -171,7 +215,7 @@
   <p class="h2sub">Monthly <b>revenue by year</b>.</p>
   <div class="panel">
     <h3>Revenue by Month and Year</h3>
-    <p class="sub">The current year runs through <b id="chart-cutoff">the latest available month</b>; prior year shows <b>all months</b>. Currency: USD.</p>
+    <p class="sub">The current year runs through <b id="chart-cutoff">the latest available month</b>; prior year shows <b>all months</b>.</p>
     <div class="legend"><span><i style="background:var(--py)"></i><span id="lg-py">Prior year</span></span><span><i style="background:var(--cy)"></i><span id="lg-cy">Current year</span></span></div>
     <div class="chart-skel"></div>
     <div class="chart-box">
@@ -181,7 +225,15 @@
   </div>
 
   <h2>Detailed Client P&amp;L</h2>
-  <p class="h2sub">Full <b>revenue-to-profit breakdown</b> by client, <b>expandable to office level</b>. YTD through <b id="pl-cutoff">the latest available month</b>. Currency: <b>USD</b>.</p>
+  <p class="h2sub">Full <b>revenue-to-profit breakdown</b> by client, <b>expandable to office level</b>. YTD through <b id="pl-cutoff">the latest available month</b>.</p>
+  <div class="pl-note">
+    <strong>How to read the totals</strong>
+    <ul>
+      <li><b>Revenue, Direct Labour, Direct Overheads and Direct Contribution</b> add up: the office rows under a client sum to the client total.</li>
+      <li><b>Indirect Costs, Profit and Profit %</b> do not add up: Indirect Costs are allocated differently at office level and at company level, so a client's total can be higher or lower than the sum of its offices. The client total is the one that reflects the full company allocation.</li>
+      <li><b>With a Country or Office filter</b>, the client total becomes the sum of the selected offices.</li>
+    </ul>
+  </div>
   <div class="panel">
     <div class="pl-wrap">
       <table class="pl" id="pl">
@@ -189,7 +241,6 @@
         <tbody id="pl-body"></tbody>
       </table>
     </div>
-    <p class="pl-note">Client rows and the grand total use the company-level (WKI) allocation of Indirect Costs, so office rows do not add up to their client for Indirect Costs, Profit and Profit %. When a Country or Office filter is applied, clients fall back to the sum of the selected offices.</p>
   </div>
 
   <p class="status err" id="status" hidden></p>
@@ -205,6 +256,8 @@
 </main>
 
 <script type="module">
+  // Sticky filters sit just below the sticky nav, whose height changes at the mobile breakpoint.
+  (() => { const nav = document.querySelector(".pnav"); if (!nav) return; const set = () => document.documentElement.style.setProperty("--nav-h", nav.offsetHeight + "px"); set(); new ResizeObserver(set).observe(nav); })();
   const viz = document.getElementById("viz");
   const statusEl = document.getElementById("status");
   const yearSel = document.getElementById("f-year");
@@ -224,17 +277,24 @@
 
   let records = new Map();
   let facts = [];
+  let scope = [];   // unique country / parent office / client combinations from the last unfiltered read; drives the cascading filters
   const expanded = new Set();
   let reading = false, rerun = false, timer = null;
 
   const syncEl = document.getElementById("sync");
   const syncText = document.getElementById("sync-text");
+  const syncMini = document.getElementById("sync-mini");
+  const syncMiniText = document.getElementById("sync-mini-text");
+  // The compact status in the sticky filter bar shows only once the header status has scrolled out of view.
+  new IntersectionObserver(([e]) => document.body.classList.toggle("sync-hidden", !e.isIntersecting)).observe(syncEl);
   let loaded = false;
   let lastSync = "";
 
   function setState(state, text, detail) {
     syncEl.className = "sync " + state;
     syncText.textContent = text;
+    syncMini.className = "sync-mini " + state;
+    syncMiniText.textContent = text;
     syncEl.title = detail || "";
     if (state === "ready" || state === "error" || state === "cached") document.body.classList.remove("is-loading");
     document.body.classList.toggle("is-updating", state === "updating");
@@ -247,7 +307,7 @@
   }
 
   // ---------- local cache (IndexedDB): paint the last unfiltered read instantly, refresh from Tableau in the background ----------
-  const CACHE_KEY = "global-client-portfolio-data-v1";
+  const CACHE_KEY = "global-client-portfolio-data-v2";
   let fromCache = false;
   function idb() {
     return new Promise((res, rej) => {
@@ -280,7 +340,7 @@
   }
   // Only an unfiltered read is cached: the page opens with no Tableau filter applied.
   function isUnfiltered() {
-    return FILTERS.every(d => { const s = document.getElementById(d.id); return !s.dataset.field || s.value === ALL; });
+    return FILTERS.every(d => { const s = document.getElementById(d.id); return !s._applied || s._applied.size === 0; });
   }
   function errText(e) { return e && e.message ? e.message : String(e); }
   function sheet() {
@@ -364,12 +424,15 @@
   function parseDetail(cols, rows, names, { mn, mv, yi, mi, ai, isLeaf }) {
     const ci = names.findIndex(n => /^reportingclient/i.test(n));
     const oi = names.findIndex(n => /^office\s*name$/i.test(n));
+    const pi = names.findIndex(n => /^parent\s*office\s*name$/i.test(n));
+    const ki = names.findIndex(n => /^country\s*name$/i.test(n));
     if (ci < 0 || oi < 0) throw new Error("No client/office columns found. Columns: " + names.join(" · "));
+    if (pi < 0 || ki < 0) throw new Error("No parent office/country columns found. Columns: " + names.join(" · "));
     const map = new Map();
     const fact = r => {
       const y = toNum(r[yi].value), m = monthOf(r[mi]), client = r[ci].formattedValue, office = r[oi].formattedValue, wki = !isLeaf(r);
       const k = [y, m, client, office, wki].join("|");
-      if (!map.has(k)) map.set(k, { y, m, client, office, wki, rev: 0, dl: 0, dov: 0, dc: 0, ind: 0 });
+      if (!map.has(k)) map.set(k, { y, m, client, office, parent: r[pi].formattedValue, country: r[ki].formattedValue, wki, rev: 0, dl: 0, dov: 0, dc: 0, ind: 0 });
       return map.get(k);
     };
     if (mn >= 0 && mv >= 0) {
@@ -396,7 +459,13 @@
     try {
       const t0 = performance.now();
       reader = await sheet().getSummaryDataReaderAsync();
-      const table = await reader.getAllPagesAsync();
+      // A selection with no rows makes getAllPagesAsync() throw ("0 is invalid value for range"): treat it as "no data".
+      let table;
+      try { table = await reader.getAllPagesAsync(); }
+      catch (e) {
+        if (!/invalid value for range/i.test(errText(e))) throw e;
+        table = { columns: [], data: [] };
+      }
       const ms = Math.round(performance.now() - t0);
       records = parse(table);
       fillYears();
@@ -404,7 +473,7 @@
       loaded = true;
       lastSync = new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
       fromCache = false;
-      if (isUnfiltered()) cachePut({ records: [...records], facts, time: lastSync });
+      if (isUnfiltered()) { scope = buildScope(facts); cachePut({ records: [...records], facts, time: lastSync }); }
       setState("ready", "Ready · Read from Tableau at " + lastSync,
         table.data.length + " rows read in " + ms + " ms");
     } catch (e) {
@@ -414,6 +483,86 @@
       reading = false;
       if (rerun) { rerun = false; refresh(); }
     }
+  }
+
+  const applyBtns = [];   // one "Apply filter" button per filter panel; all apply every pending change together
+  // ---------- multi-select combo: a button + checkbox panel over a hidden <select> (kept only for its disabled state) ----------
+  // sel._all = every option {value,label}; sel._opts = options currently offered (cascade); sel._picked = chosen values (empty = All);
+  // sel._applied = values last sent to Tableau. Picking changes nothing in Tableau until "Apply filters".
+  function enhanceSelect(sel) {
+    if (sel.dataset.combo) return;
+    sel.dataset.combo = "1";
+    sel._picked = new Set(); sel._applied = new Set(); sel._opts = sel._all || [];
+    const label = document.querySelector('label[for="' + sel.id + '"]');
+    const wrap = document.createElement("div"); wrap.className = "combo";
+    sel.parentNode.insertBefore(wrap, sel);
+    const btn = document.createElement("button");
+    btn.type = "button"; btn.className = "combo-btn"; btn.id = sel.id + "-combo";
+    btn.setAttribute("aria-haspopup", "listbox"); btn.setAttribute("aria-expanded", "false");
+    if (label) label.htmlFor = btn.id;
+    const panel = document.createElement("div"); panel.className = "combo-panel"; panel.hidden = true;
+    const search = document.createElement("input");
+    search.type = "search"; search.className = "combo-search"; search.placeholder = "Search…";
+    search.setAttribute("aria-label", "Search " + (label ? label.textContent : "options"));
+    const list = document.createElement("ul"); list.className = "combo-list"; list.setAttribute("role", "listbox");
+    list.setAttribute("aria-multiselectable", "true");
+    const foot = document.createElement("div"); foot.className = "combo-foot";
+    const apply = document.createElement("button");
+    apply.type = "button"; apply.className = "apply-btn"; apply.textContent = "Apply filter"; apply.disabled = true;
+    apply.addEventListener("click", async () => { close(true); await applyFilters(); });
+    foot.appendChild(apply);
+    applyBtns.push(apply);
+    panel.append(search, list, foot);
+    wrap.append(btn, panel, sel);
+    sel.hidden = true;
+    let items = [], active = -1;
+    const sync = () => {
+      const n = sel._picked.size;
+      const first = n === 1 ? sel._all.find(v => sel._picked.has(v.value)) : null;
+      btn.textContent = n === 0 ? "(All)" : n === 1 ? (first ? first.label : "1 selected") : n + " selected";
+      btn.disabled = sel.disabled;
+    };
+    sel._comboSync = sync;
+    const close = focusBtn => { panel.hidden = true; btn.setAttribute("aria-expanded", "false"); if (focusBtn) btn.focus(); };
+    const setActive = i => { active = i; items.forEach((li, k) => li.classList.toggle("active", k === i)); if (items[i]) items[i].scrollIntoView({ block: "nearest" }); };
+    const toggle = v => {
+      if (v === ALL) sel._picked.clear();
+      else if (sel._picked.has(v)) sel._picked.delete(v);
+      else sel._picked.add(v);
+      onPicked();
+      const keep = active, top = list.scrollTop;
+      render();
+      list.scrollTop = top;
+      if (keep >= 0) setActive(Math.min(keep, items.length - 1));
+    };
+    const render = () => {
+      const q = search.value.trim().toLowerCase();
+      list.replaceChildren(); items = [];
+      const add = (value, text) => {
+        const li = document.createElement("li");
+        li.setAttribute("role", "option"); li.textContent = text; li.dataset.value = value;        li.setAttribute("aria-selected", String(value === ALL ? sel._picked.size === 0 : sel._picked.has(value)));
+        li.addEventListener("mousedown", e => { e.preventDefault(); toggle(value); });
+        list.appendChild(li); items.push(li);
+      };
+      if (!q) add(ALL, "(All)");
+      sel._opts.forEach(o => { if (!q || o.label.toLowerCase().includes(q)) add(o.value, o.label); });
+      if (!items.length) { const li = document.createElement("li"); li.className = "none"; li.textContent = "No matches"; list.appendChild(li); }
+      setActive(items.length && q ? 0 : -1);
+    };
+    const open = () => { if (btn.disabled) return; panel.hidden = false; btn.setAttribute("aria-expanded", "true"); search.value = ""; render(); search.focus(); };
+    btn.addEventListener("click", () => panel.hidden ? open() : close(false));
+    search.addEventListener("input", render);
+    search.addEventListener("keydown", e => {
+      if (e.key === "ArrowDown") { e.preventDefault(); if (items.length) setActive((active + 1) % items.length); }
+      else if (e.key === "ArrowUp") { e.preventDefault(); if (items.length) setActive((active - 1 + items.length) % items.length); }
+      else if (e.key === "Enter") { e.preventDefault(); if (items[active]) toggle(items[active].dataset.value); }
+      else if (e.key === "Escape") { e.preventDefault(); close(true); }
+      else if (e.key === "Tab") close(false);
+    });
+    // Capture phase: checked before an option click re-renders the list and detaches the clicked <li>.
+    document.addEventListener("mousedown", e => { if (!wrap.contains(e.target)) close(false); }, true);
+    new MutationObserver(sync).observe(sel, { attributes: true, attributeFilter: ["disabled"] });
+    sync();
   }
 
   // ---------- filters ----------
@@ -436,34 +585,79 @@
       if (!f) { sel.title = "Filter not found on the Tableau sheet"; continue; }
       try {
         const domain = await f.getDomainAsync("relevant");
+        // A Null value is kept but labelled "(Null)" and listed first, right after (All).
+        const isNull = v => String(v.value) === "%null%" || /^null$/i.test(String(v.label).trim());
         const vals = domain.values
           .map(v => ({ value: v.value, label: v.formattedValue }))
           .filter(v => v.label !== null && v.label !== undefined && String(v.label).trim() !== "")
-          .sort((a, b) => String(a.label).localeCompare(String(b.label)));
-        sel.replaceChildren();
-        const all = document.createElement("option"); all.value = ALL; all.textContent = "(All)"; sel.appendChild(all);
-        vals.forEach(v => { const o = document.createElement("option"); o.value = String(v.value); o.textContent = v.label; sel.appendChild(o); });
+          .map(v => isNull(v) ? { ...v, label: "(Null)", first: true } : v)
+          .sort((a, b) => (b.first ? 1 : 0) - (a.first ? 1 : 0) || String(a.label).localeCompare(String(b.label)));
+        sel._all = vals.map(v => ({ value: String(v.value), label: v.label }));
         sel.dataset.field = f.fieldName;
+        enhanceSelect(sel);
         sel.disabled = false;
-        sel.addEventListener("change", () => applyFilter(sel));
       } catch (e) {
         sel.title = "Could not load values: " + errText(e);
       }
     }
   }
 
-  async function applyFilter(sel) {
-    const selects = FILTERS.map(d => document.getElementById(d.id));
+  // ---------- cascading filters: Country → Office → Reporting Client ----------
+  function buildScope(fs) {
+    const m = new Map();
+    fs.forEach(f => { if (!f.wki) m.set([f.country, f.parent, f.client].join("|"), { country: f.country, parent: f.parent, client: f.client }); });
+    return [...m.values()];
+  }
+  // Offer only the options `keep` accepts; picks that are no longer offered are dropped. Returns true if any pick was dropped.
+  function setOptions(sel, keep) {
+    if (!sel._picked) return false;
+    sel._opts = (sel._all || []).filter(keep);
+    const ok = new Set(sel._opts.map(v => v.value));
+    let dropped = false;
+    sel._picked.forEach(v => { if (!ok.has(v)) { sel._picked.delete(v); dropped = true; } });
+    if (sel._comboSync) sel._comboSync();
+    return dropped;
+  }
+  // Narrows Office by the picked countries, and Reporting Client by the picked countries and offices.
+  function cascade() {
+    if (!scope.length) return;
+    const cS = document.getElementById("f-country"), oS = document.getElementById("f-office"), kS = document.getElementById("f-client");
+    const labs = s => !s._picked || !s._picked.size ? null : new Set((s._all || []).filter(v => s._picked.has(v.value)).map(v => v.label));
+    const cLabs = labs(cS);
+    const inCountry = scope.filter(t => !cLabs || cLabs.has(t.country));
+    const offices = new Set(inCountry.map(t => t.parent));
+    setOptions(oS, v => !cLabs || offices.has(v.label));
+    const oLabs = labs(oS);
+    const clients = new Set(inCountry.filter(t => !oLabs || oLabs.has(t.parent)).map(t => t.client));
+    setOptions(kS, v => (!cLabs && !oLabs) || clients.has(v.label));
+  }
+
+  // ---------- applying: picks are held until "Apply filters" sends them to Tableau in one read ----------
+  let applying = false;
+  const sig = set => [...set].sort().join("\u0001");
+  const filterSelects = () => FILTERS.map(d => document.getElementById(d.id)).filter(s => s._picked);
+  const isDirty = () => filterSelects().some(s => sig(s._picked) !== sig(s._applied));
+  function updateApply() { const off = applying || !isDirty(); applyBtns.forEach(b => { b.disabled = off; b.classList.toggle("pending", !off); }); }
+  function onPicked() { cascade(); updateApply(); }
+  const applyOne = s => { const v = [...s._picked]; return v.length ? sheet().applyFilterAsync(s.dataset.field, v, "replace") : sheet().applyFilterAsync(s.dataset.field, [], "all"); };
+
+  async function applyFilters() {
+    const selects = filterSelects();
+    applying = true; updateApply();
     selects.forEach(s => s.disabled = true);
     setState("updating", "Updating…");
     try {
-      if (sel.value === ALL) await sheet().applyFilterAsync(sel.dataset.field, [], "all");
-      else await sheet().applyFilterAsync(sel.dataset.field, [sel.value], "replace");
+      for (const s of selects) {
+        if (sig(s._picked) === sig(s._applied)) continue;
+        await applyOne(s);
+        s._applied = new Set(s._picked);
+      }
       refresh();
     } catch (e) {
       setState("error", "Error", "Could not apply the filter in Tableau: " + errText(e));
     } finally {
-      selects.forEach(s => { if (s.dataset.field) s.disabled = false; });
+      selects.forEach(s => { s.disabled = false; });
+      applying = false; updateApply();
     }
   }
 
@@ -503,7 +697,9 @@
     document.getElementById("empty-state").hidden = !!cyYear;
     if (!cyYear) {
       for (const id of ["k-rev", "k-dc", "k-cm", "k-pr", "k-pp"]) setKpi(id, "—", "", "", null, "n/a");
-      document.getElementById("period-label").textContent = "the latest available month";
+      document.getElementById("period-pill").hidden = true;
+      document.getElementById("lg-py").textContent = "Prior year";
+      document.getElementById("lg-cy").textContent = "Current year";
       document.getElementById("chart-cutoff").textContent = "the latest available month";
       document.getElementById("chart").replaceChildren();
       document.getElementById("pl-body").replaceChildren();
@@ -513,28 +709,33 @@
     const cyMonths = [...records.values()].filter(r => r.y === cyYear && r.rev !== null).map(r => r.m);
     const cutoff = cyMonths.length ? Math.max(...cyMonths) : 12;
     const cutoffLabel = cyMonths.length ? MONTHS[cutoff - 1] + " " + cyYear : "the latest available month";
-    document.getElementById("period-label").textContent = cutoffLabel;
     document.getElementById("chart-cutoff").textContent = cutoffLabel;
     const pyYear = cyYear - 1;
+    const rangeOf = y => (cutoff === 1 ? MONTHS[0].slice(0, 3) : MONTHS[0].slice(0, 3) + "–" + MONTHS[cutoff - 1].slice(0, 3)) + " " + y;
+    const pyLabel = rangeOf(pyYear);
     const cy = sums(cyYear, cutoff), py = sums(pyYear, cutoff);
 
     const dRev = cy && py ? pctDelta(cy.rev, py.rev) : null;
     const dGp = cy && py ? pctDelta(cy.gp, py.gp) : null;
-    const dCm = cy && py && cy.cm !== null && py.cm !== null ? (cy.cm - py.cm) * 10000 : null;
+    const dCm = cy && py && cy.cm !== null && py.cm !== null ? (cy.cm - py.cm) * 100 : null;
 
-    setKpi("k-rev", fmtMoney(cy ? cy.rev : null), py ? pyYear : "", py ? fmtMoney(py.rev) : "", dRev, dRev === null ? "n/a" : signed(dRev * 100, 1, "%"));
-    setKpi("k-dc", fmtMoney(cy ? cy.gp : null), py ? pyYear : "", py ? fmtMoney(py.gp) : "", dGp, dGp === null ? "n/a" : signed(dGp * 100, 1, "%"));
-    setKpi("k-cm", fmtPct(cy ? cy.cm : null), py ? pyYear : "", py ? fmtPct(py.cm) : "", dCm, dCm === null ? "n/a" : signed(dCm, 0, " bps"));
+    setKpi("k-rev", fmtMoney(cy ? cy.rev : null), py ? pyLabel : "", py ? fmtMoney(py.rev) : "", dRev, dRev === null ? "n/a" : signed(dRev * 100, 1, "%"));
+    setKpi("k-dc", fmtMoney(cy ? cy.gp : null), py ? pyLabel : "", py ? fmtMoney(py.gp) : "", dGp, dGp === null ? "n/a" : signed(dGp * 100, 1, "%"));
+    setKpi("k-cm", fmtPct(cy ? cy.cm : null), py ? pyLabel : "", py ? fmtPct(py.cm) : "", dCm, dCm === null ? "n/a" : signed(dCm, 1, " pts"));
 
     // Profit / Profit %: same WKI-or-leaf rule as the table's Grand Total, so both always agree.
     const prof = y => { const { list, total } = plClients(y, cutoff); if (!list.length) return null;
       const p = total.dc - total.ind; return { p, pct: Math.abs(total.rev) < 1 ? null : p / total.rev }; };
     const cp = prof(cyYear), pp = prof(pyYear);
     const dP = cp && pp ? pctDelta(cp.p, pp.p) : null;
-    const dPp = cp && pp && cp.pct !== null && pp.pct !== null ? (cp.pct - pp.pct) * 10000 : null;
-    setKpi("k-pr", fmtMoney(cp ? cp.p : null), pp ? pyYear : "", pp ? fmtMoney(pp.p) : "", dP, dP === null ? "n/a" : signed(dP * 100, 1, "%"));
-    setKpi("k-pp", fmtPct(cp ? cp.pct : null), pp ? pyYear : "", pp ? fmtPct(pp.pct) : "", dPp, dPp === null ? "n/a" : signed(dPp, 0, " bps"));
+    const dPp = cp && pp && cp.pct !== null && pp.pct !== null ? (cp.pct - pp.pct) * 100 : null;
+    setKpi("k-pr", fmtMoney(cp ? cp.p : null), pp ? pyLabel : "", pp ? fmtMoney(pp.p) : "", dP, dP === null ? "n/a" : signed(dP * 100, 1, "%"));
+    setKpi("k-pp", fmtPct(cp ? cp.pct : null), pp ? pyLabel : "", pp ? fmtPct(pp.pct) : "", dPp, dPp === null ? "n/a" : signed(dPp, 1, " pts"));
 
+    const pill = document.getElementById("period-pill");
+    pill.innerHTML = '<span class="mode">' + (cutoff < 12 ? "YTD" : "Full year") + '</span><b>' + rangeOf(cyYear) + '</b>'
+      + (py ? '<span class="vs">vs</span><b>' + pyLabel + '</b>' : "") + '<span class="vs">· USD</span>';
+    pill.hidden = false;
     document.getElementById("lg-py").textContent = pyYear;
     document.getElementById("lg-cy").textContent = cyYear;
     drawChart(cyYear, pyYear, cutoff);
@@ -550,6 +751,37 @@
   function plRow(label) { return { label, rev: 0, dl: 0, dov: 0, dc: 0, ind: 0 }; }
   function addTo(t, f) { for (const k of ["rev", "dl", "dov", "dc", "ind"]) t[k] += f[k]; }
   const NO_CLIENT = "(No client)";
+  const NO_CLIENT_INFO = "Revenue and costs not assigned to a client. Its Indirect Costs are zero at company level; with a Country or Office filter they show the selected offices' amounts.";
+  // One shared pop-up for the (i) buttons: opens on hover, focus or click (touch); closes on mouse leave, blur, outside click, Escape or scroll.
+  const infoPop = document.createElement("div");
+  infoPop.className = "info-pop"; infoPop.hidden = true; infoPop.setAttribute("role", "tooltip");
+  document.body.appendChild(infoPop);
+  let infoOwner = null;
+  function hideInfo() { infoPop.hidden = true; if (infoOwner) infoOwner.setAttribute("aria-expanded", "false"); infoOwner = null; }
+  function infoButton(text) {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "info-btn"; b.textContent = "i";
+    b.setAttribute("aria-label", "More about this row"); b.setAttribute("aria-expanded", "false");
+    const show = () => {
+      if (infoOwner === b) return;
+      hideInfo();
+      infoPop.textContent = text; infoPop.hidden = false;
+      const r = b.getBoundingClientRect();
+      infoPop.style.left = Math.max(8, Math.min(r.left, window.innerWidth - infoPop.offsetWidth - 8)) + "px";
+      infoPop.style.top = (r.top - infoPop.offsetHeight - 8 >= 8 ? r.top - infoPop.offsetHeight - 8 : r.bottom + 8) + "px";
+      infoOwner = b; b.setAttribute("aria-expanded", "true");
+    };
+    b.addEventListener("mouseenter", show);
+    b.addEventListener("mouseleave", hideInfo);
+    b.addEventListener("focus", show);
+    b.addEventListener("blur", hideInfo);
+    b.addEventListener("click", e => { e.stopPropagation(); show(); });
+    return b;
+  }
+  document.addEventListener("click", hideInfo);
+  document.addEventListener("keydown", e => { if (e.key === "Escape") hideInfo(); });
+  window.addEventListener("scroll", hideInfo, true);
+  window.addEventListener("resize", hideInfo);
   // Default order: Revenue, then Direct Contribution, Profit and Profit % as tie-breakers (all descending); "(No client)" last.
   const desc = (x, y) => x === y ? 0 : x > y ? -1 : 1;
   const profitPct = r => Math.abs(r.rev) < 1 ? -Infinity : (r.dc - r.ind) / r.rev;
@@ -599,6 +831,7 @@
 
   function drawTable(year, cutoff) {
     plArgs = [year, cutoff];
+    hideInfo();
     const { list, total } = plClients(year, cutoff);
 
     const cells = r => {
@@ -626,7 +859,9 @@
         expanded.has(c.label) ? expanded.delete(c.label) : expanded.add(c.label);
         drawTable(year, cutoff);
       });
-      frag.appendChild(tr("client", btn, cells(c)));
+      let first = btn;
+      if (c.label === NO_CLIENT) { first = document.createElement("span"); first.append(btn, infoButton(NO_CLIENT_INFO)); }
+      frag.appendChild(tr("client", first, cells(c)));
       if (open) c.offices.sort(plOrder).forEach(o => frag.appendChild(tr("office", o.label, cells(o))));
     });
     body.replaceChildren(frag);
@@ -725,6 +960,7 @@
     try {
       records = new Map(c.records);
       facts = c.facts;
+      scope = buildScope(facts);
       fillYears();
       render();
     } catch (_) { records = new Map(); facts = []; return; }
