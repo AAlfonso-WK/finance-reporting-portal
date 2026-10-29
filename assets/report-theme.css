@@ -1,0 +1,61 @@
+/* Light / Dark theme for the report pages (Global Client Portfolio, Office Profitability and the client pages).
+   Light is each page's own palette; this file adds the values the pages' scripts read for their charts (--c-*)
+   and the Dark palette. The theme is switched by assets/portal-shell.js through html[data-theme]. */
+:root {
+  --c-ink: #111111; --c-ink2: #4F4F4A; --c-ink3: #7B7B74;
+  --c-grid: #E6E6E2; --c-gridv: #DDDDDA; --c-zero: #C9C9C3; --c-conn: #A6A6A0;
+  --c-neg: #B2182B; --c-good: #146B3A;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0B0B0B; --panel: #141414; --card: #1A1A1A; --band: #191919;
+  --ink: #F2F2EC; --ink2: #B8B8B0; --ink3: #8C8C84; --line: #2C2C29; --line2: #3E3E3A;
+  --good: #4ADE80; --bad: #FF6B5F; --good-dark: #4ADE80; --bad-dark: #FF6B5F; --head: #2A2A27;
+  --field: #1B1B1B; --hover: #262623; --totalbg: #222220; --offbg: #171717;
+  --c-ink: #F2F2EC; --c-ink2: #B8B8B0; --c-ink3: #8C8C84;
+  --c-grid: #2C2C29; --c-gridv: #2C2C29; --c-zero: #46463F; --c-conn: #6E6E67;
+  --c-neg: #FF6B5F; --c-good: #4ADE80; --c-py: #6E6E67; --c-cy: #F2F2EC;
+}
+
+/* Form controls: the white fields become dark, and the chevron and the check mark turn light. */
+html[data-theme="dark"] .controls, html[data-theme="dark"] .filters {
+  --chev: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23F2F2EC' stroke-width='2'/%3E%3C/svg%3E");
+  --chev-off: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%238C8C84' stroke-width='2'/%3E%3C/svg%3E");
+}
+html[data-theme="dark"] .controls select, html[data-theme="dark"] .filters select, html[data-theme="dark"] .combo-btn,
+html[data-theme="dark"] .combo-panel, html[data-theme="dark"] .combo-search, html[data-theme="dark"] .combo-foot,
+html[data-theme="dark"] .apply-btn, html[data-theme="dark"] .combo-list li::before { background-color: var(--field); }
+html[data-theme="dark"] .combo-list li.active { background: var(--hover); }
+html[data-theme="dark"] .combo-list li[aria-selected="true"]::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6.5l3 3 5-7' fill='none' stroke='%23F2F2EC' stroke-width='1.2'/%3E%3C/svg%3E");
+}
+html[data-theme="dark"] .apply-btn.pending { color: var(--bg); }
+
+/* Tables */
+html[data-theme="dark"] .tbl tr.total td, html[data-theme="dark"] .tbl tbody tr.total td, html[data-theme="dark"] .pl tr.total td { background: var(--totalbg); }
+html[data-theme="dark"] .pl tr.office td { background: var(--offbg); }
+html[data-theme="dark"] .tbl tbody tr.hl td, html[data-theme="dark"] .mx tr.hl td.nm, html[data-theme="dark"] .rank-row.hl { background: color-mix(in srgb, var(--accent) 30%, var(--panel)); }
+
+/* Tooltips and pop-ups use the ink color as background, so their text takes the page color. */
+html[data-theme="dark"] .chart-tip, html[data-theme="dark"] .info-pop { color: var(--bg); }
+html[data-theme="dark"] .chart-tip .d.pos { color: #146B3A; } html[data-theme="dark"] .chart-tip .d.neg { color: #B2182B; }
+html[data-theme="dark"] .info-btn:hover, html[data-theme="dark"] .info-btn[aria-expanded="true"] { color: var(--bg); }
+
+/* Global Client Portfolio and Office Profitability */
+html[data-theme="dark"] body:not(.client-report) .period .mode { color: var(--bg); }
+html[data-theme="dark"] body:not(.client-report) .kpi.dark { background: #26261F; color: #fff; border-color: var(--line2); }
+html[data-theme="dark"] body:not(.client-report) .rank-row .bar { background: #5F5F58; }
+html[data-theme="dark"] body:not(.client-report) .rank-row .bar.neg { background: var(--bad); }
+html[data-theme="dark"] body:not(.client-report) .rank-row.sel .bar { background: var(--ink); }
+html[data-theme="dark"] body:not(.client-report) .rank-row.sel .bar.neg { background: var(--bad); }
+html[data-theme="dark"] .pl th { background: var(--panel); }
+
+/* Client pages: the dark cards need an edge on the dark page. */
+html[data-theme="dark"] .client-report .kpi { border: 1px solid var(--line2); border-top: 6px solid var(--accent); }
+html[data-theme="dark"] .client-report .period .mode { box-shadow: 0 0 0 1px var(--line2); }
+html[data-theme="dark"] .warn { background: #2B2410; border-color: #5A4A1A; color: #E8D9A8; }
+
+/* Loading skeletons */
+html[data-theme="dark"] .chart-skel { background: repeating-linear-gradient(90deg, #1F1F1D 0 36px, transparent 36px 58px) bottom / 100% 70% no-repeat; }
+html[data-theme="dark"] body.is-loading .kpi .v, html[data-theme="dark"] body.is-loading .kpi .row span { background: #2A2A27; }

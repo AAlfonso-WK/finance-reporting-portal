@@ -1,43 +1,6 @@
 const root = document.documentElement;
 root.classList.add("has-js");
 
-function readTheme() {
-  try {
-    return localStorage.getItem("wk-theme");
-  } catch (error) {
-    return null;
-  }
-}
-
-function writeTheme(theme) {
-  try {
-    localStorage.setItem("wk-theme", theme);
-  } catch (error) {
-    return null;
-  }
-}
-
-const storedTheme = readTheme();
-const themeToggle = document.querySelector("[data-theme-toggle]");
-
-function setTheme(theme) {
-  root.dataset.theme = theme;
-  writeTheme(theme);
-  if (themeToggle) {
-    themeToggle.setAttribute("aria-pressed", String(theme === "light"));
-    themeToggle.querySelector("[data-theme-label]").textContent =
-      theme === "light" ? "Light" : "Dark";
-  }
-}
-
-setTheme(storedTheme || root.dataset.theme || "dark");
-
-if (themeToggle) {
-  themeToggle.addEventListener("click", () => {
-    setTheme(root.dataset.theme === "dark" ? "light" : "dark");
-  });
-}
-
 const revealItems = document.querySelectorAll("[data-reveal]");
 
 if ("IntersectionObserver" in window) {
