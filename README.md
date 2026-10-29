@@ -52,6 +52,9 @@ Copy any client page and edit only the `window.CLIENT` block at the top of the s
 - `accent`: border and strip color.
 - `mark`, `dot`, `label` (optional): fill of the ranking bars, fill of the scatter dots and color of the small
   header label; each defaults to `accent`.
+- `image`, `tint`, `shade`, `rule` (optional): the photo behind the top banner, the overlay color as "r, g, b",
+  the overlay opacity at the top and at the bottom, and the color of the banner's bottom border (defaults to
+  `accent`). The photos are loaded from Unsplash.
 
 Then add the page to `PAGES` in `assets/portal-shell.js` and to the client tiles in `index.html`.
 
