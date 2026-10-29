@@ -45,17 +45,17 @@
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Archivo", system-ui, sans-serif; font-size: 14px; line-height: 1.45; }
   /* Top banner: the client's photo under a dark overlay, with the accent as top and bottom rule. */
-  .shell { position: relative; overflow: hidden; background: var(--banner, var(--brand)); color: #fff; text-align: center; padding: clamp(22px, 3vw, 36px) clamp(24px, 5vw, 64px); border-top: 3px solid var(--accent); border-bottom: 6px solid var(--rule, var(--accent)); }
+  .shell { position: relative; overflow: hidden; background: var(--banner, var(--brand)); color: #fff; text-align: left; padding: clamp(22px, 3vw, 36px) clamp(24px, 5vw, 64px); border-top: 3px solid var(--accent); border-bottom: 6px solid var(--rule, var(--accent)); }
   .shell::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 8%, transparent), transparent 30%, transparent 70%, color-mix(in srgb, var(--accent) 8%, transparent)); }
   .shell > * { position: relative; }
   .shell .brand-label { margin: 0 0 clamp(10px, 1.3vw, 14px); font-size: clamp(11px, 1.2vw, 13px); font-weight: 400; line-height: 1; letter-spacing: clamp(2px, 0.35vw, 4px); text-transform: uppercase; color: var(--label); }
   .shell h1 { margin: 0 0 clamp(10px, 1.4vw, 14px); font-size: clamp(30px, 4vw, 44px); font-weight: 300; line-height: 1.08; letter-spacing: clamp(0.5px, 0.12vw, 1.5px); text-shadow: 0 2px 12px rgba(0, 0, 0, .65); }
-  .shell .shell-desc { max-width: 900px; margin: 0 auto; color: #D5D5D5; font-size: clamp(14px, 1.5vw, 16px); font-weight: 300; line-height: 1.45; letter-spacing: .15px; text-shadow: 0 1px 8px rgba(0, 0, 0, .75); }
+  .shell .shell-desc { max-width: 900px; margin: 0; color: #D5D5D5; font-size: clamp(14px, 1.5vw, 16px); font-weight: 300; line-height: 1.45; letter-spacing: .15px; text-shadow: 0 1px 8px rgba(0, 0, 0, .75); }
   .sync { display: inline-flex; align-items: center; gap: 9px; margin-top: 12px; padding: 6px 14px 6px 12px; border: 1px solid rgba(255,255,255,.28); border-radius: 999px; background: rgba(255,255,255,.08); font-weight: 600; font-size: 14px; color: #FFFFFF; cursor: default; }
   .sync .dot { width: 10px; height: 10px; border-radius: 50%; background: #A6A6A0; flex: none; }
   .sync.loading .dot, .sync.updating .dot, .sync.signin .dot, .sync.cached .dot { background: #FF6B5F; animation: pulse .8s ease-in-out infinite; }
   .sync.loading, .sync.updating, .sync.signin, .sync.cached { border-color: #FF6B5F; }
-  #signin { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px 16px; margin-top: 12px; font-size: 14px; color: #E7E8E6; }
+  #signin { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 16px; margin-top: 12px; font-size: 14px; color: #E7E8E6; }
   #signin[hidden] { display: none; }
   #signin button { font: inherit; font-weight: 700; padding: 8px 16px; background: #FFFFFF; color: #111111; border: 0; border-radius: 3px; cursor: pointer; }
   #signin button:focus-visible { outline: 2px solid #FFFFFF; outline-offset: 2px; }
