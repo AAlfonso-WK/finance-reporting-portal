@@ -6,6 +6,9 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Office Profitability</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%23080808'/%3E%3Ctext x='50%25' y='54%25' text-anchor='middle' font-size='18' font-family='Arial' font-weight='700' fill='white'%3EW%2BK%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/portal-shell.css">
+<link rel="stylesheet" href="assets/report-theme.css">
+<script src="assets/portal-shell.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script type="module" src="https://prod-useast-a.online.tableau.com/javascripts/api/tableau.embedding.3.latest.min.js"></script>
@@ -13,28 +16,10 @@
   :root {
     --bg: #F2F1ED; --panel: #FCFCFA; --card: #F4F4F2; --band: #F8F8F5;
     --ink: #111111; --ink2: #4F4F4A; --ink3: #7B7B74; --line: #DDDDDA; --line2: #C9C9C3;
-    --good: #146B3A; --bad: #C0392B; --good-dark: #4ADE80; --bad-dark: #FF6B5F;
+    --good: #146B3A; --bad: #C0392B; --good-dark: #4ADE80; --bad-dark: #FF6B5F; --c-py: #7B7B74; --c-cy: #111111;
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Archivo", system-ui, sans-serif; font-size: 14px; line-height: 1.45; }
-  .pnav { position: sticky; top: 0; z-index: 200; background: #0A0A0A; border-bottom: 1px solid #2A2A2A; display: flex; align-items: center; justify-content: space-between; gap: 28px; padding: 15px clamp(18px, 4vw, 48px); line-height: 1.5; }
-  .pnav__brand { display: inline-flex; align-items: center; gap: 10px; min-width: max-content; color: #fff; text-decoration: none; font-size: 0.76rem; font-weight: 700; letter-spacing: .12em; line-height: 1; text-transform: uppercase; white-space: nowrap; }
-  .pnav__mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: #F8F8F2; color: #0A0A0A; font-size: 0.64rem; font-weight: 700; letter-spacing: 0; }
-  .pnav__links { display: flex; align-items: center; justify-content: flex-end; gap: clamp(10px, 1.8vw, 24px); min-width: 0; }
-  .pnav__links a { font-family: "IBM Plex Mono", Consolas, monospace; font-size: 0.75rem; letter-spacing: .07em; text-transform: uppercase; color: #E7E8E6; text-decoration: none; padding: 8px 16px; border: 1px solid #55554F; border-radius: 999px; transition: background .15s, border-color .15s; }
-  .pnav__links a:hover { background: #2A2A2A; border-color: #A6A6A0; }
-  .pnav__links a[aria-current="page"] { background: #F8F8F2; border-color: #F8F8F2; color: #0A0A0A; font-weight: 600; }
-  .pnav__links a:focus-visible, .pnav__brand:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-  .pnav__menu { position: relative; }
-  .pnav__menu summary { list-style: none; cursor: pointer; font-family: "IBM Plex Mono", Consolas, monospace; font-size: 0.75rem; letter-spacing: .07em; text-transform: uppercase; color: #E7E8E6; padding: 8px 16px; border: 1px solid #55554F; border-radius: 999px; transition: background .15s, border-color .15s; white-space: nowrap; }
-  .pnav__menu summary::-webkit-details-marker { display: none; }
-  .pnav__menu summary::after { content: " \25BE"; }
-  .pnav__menu summary:hover { background: #2A2A2A; border-color: #A6A6A0; }
-  .pnav__menu summary:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-  .pnav__drop { position: absolute; right: 0; top: calc(100% + 6px); min-width: 230px; display: flex; flex-direction: column; gap: 2px; padding: 6px; background: #0A0A0A; border: 1px solid #55554F; border-radius: 12px; box-shadow: 0 4px 14px rgba(0,0,0,.35); }
-  .pnav__drop a { border: 0; border-radius: 8px; padding: 9px 12px; white-space: nowrap; }
-  @media (max-width: 640px) { .pnav { padding: 10px 16px; } .pnav__brand span:last-child { display: none; } }
-  .pnav + .shell { padding-top: 16px; }
   .shell { background: #0A0A0A; color: #fff; padding: 20px 24px 18px; }
   .shell .brand-label { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #B7B7B2; }
   .shell h1 { font-size: 30px; font-weight: 800; line-height: 1.15; margin: 4px 0 0; }
@@ -59,7 +44,7 @@
   body.is-updating .kpis { opacity: .45; transition: opacity .15s; }
   main { max-width: 1480px; margin: 0 auto; padding: 0 0 48px; }
 
-  .filters { position: sticky; top: var(--nav-h, 68px); z-index: 190; border-bottom: 1px solid var(--line); background: var(--panel); display: grid; grid-template-columns: repeat(2, minmax(0, 320px)); gap: 20px; padding: 28px 12px 16px; }
+  .filters { position: sticky; top: var(--nav-h, 0px); z-index: 190; border-bottom: 1px solid var(--line); background: var(--panel); display: grid; grid-template-columns: repeat(2, minmax(0, 320px)); gap: 20px; padding: 28px 12px 16px; }
   .filters label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--ink2); margin-bottom: 3px; letter-spacing: .02em; }
   .filters { --chev: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23111111' stroke-width='2'/%3E%3C/svg%3E"); --chev-off: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%237B7B74' stroke-width='2'/%3E%3C/svg%3E"); }
   .filters select { width: 100%; min-height: 26px; font: inherit; font-size: 13px; padding: 3px 26px 3px 6px; border: 1px solid var(--ink); background: #fff var(--chev) no-repeat right 9px center / 12px 8px; border-radius: 0; appearance: none; -webkit-appearance: none; }
@@ -148,7 +133,8 @@
   .chart-tip .v { font-size: 14px; font-weight: 600; }
   .chart-tip .d.pos { color: var(--good-dark); } .chart-tip .d.neg { color: var(--bad-dark); }
 
-  .pl-wrap { overflow-x: auto; }
+  .pl-wrap { overflow: auto; max-height: calc(44px + 20 * 36px); }   /* the header plus about 20 rows; the rest scrolls */
+  .pl thead th { position: sticky; top: 0; z-index: 2; background: var(--panel); border-bottom: 0; box-shadow: inset 0 -1px 0 var(--line2); }
   .pl { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
   .pl th { font-size: 11.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink2); text-align: right; padding: 14px 12px 12px; border-bottom: 1px solid var(--line2); white-space: nowrap; }
   .pl th:first-child, .pl td:first-child { text-align: left; }
@@ -168,8 +154,11 @@
 
   .status { font-size: 12px; color: var(--ink3); margin: 14px 12px 0; }
   .status.err { color: var(--bad); font-weight: 600; }
-  .source { margin-top: 34px; }
+  .source { margin: 16px 0 0; }
+  /* Kept laid out off-screen (not display:none) so the embed still loads; revealed when sign-in is needed or with ?source in the address. */
+  .source.is-hidden { position: absolute; left: -10000px; top: 0; width: 1100px; height: 480px; overflow: hidden; margin: 0; }
   .source h2 { font-size: 18px; font-weight: 800; margin: 0 12px 2px; }
+  .source tableau-viz { display: block; }
   .source .note { font-size: 12.5px; color: var(--ink2); margin: 0 12px 8px; }
 
   @media (max-width: 900px) {
@@ -182,28 +171,25 @@
 </style>
 </head>
 <body class="is-loading">
-<nav class="pnav" aria-label="Portal">
-  <a class="pnav__brand" href="index.html"><span class="pnav__mark">W+K</span><span>Finance Portal</span></a>
-  <div class="pnav__links">
-    <a href="index.html">Home</a>
-    <a href="global-client-portfolio.html">Global Client Portfolio</a>
-    <a href="office-profitability.html" aria-current="page">Office Profitability</a>
-    <details class="pnav__menu">
-      <summary>Client Profitability</summary>
-      <div class="pnav__drop"><a href="anheuser-busch-inbev.html">Anheuser-Busch InBev</a><a href="eli-lilly.html">Eli Lilly</a><a href="ford.html">Ford</a><a href="kraft-heinz.html">Kraft Heinz</a><a href="mcdonalds.html">McDonald's</a><a href="nike.html">Nike</a></div>
-    </details>
-  </div>
-</nav>
 <div class="shell">
   <div class="brand-label">Wieden+Kennedy</div>
   <h1>Office Profitability</h1>
   <div class="sync loading" id="sync" role="status" aria-live="polite"><span class="dot"></span><span id="sync-text">Loading data…</span></div>
   <div class="signin" id="signin" hidden>
-    <span>Tableau needs you to sign in before the report can load. The sign-in box is in the Tableau view at the bottom of the page.</span>
+    <span>Tableau needs you to sign in before the report can load. The sign-in box is just below.</span>
     <button type="button" id="signin-btn">Sign in below ↓</button>
   </div>
 </div>
 <main>
+  <section class="source is-hidden" id="source" aria-hidden="true">
+    <h2 id="source-title">Sign in to Tableau</h2>
+    <p class="note" id="source-note">Use the box below to sign in and load the report. This box disappears once the data loads.</p>
+    <tableau-viz id="viz"
+      src="https://prod-useast-a.online.tableau.com/t/wk/views/ProfitabilityPortalData/SRC_CPD_ClientOfficeMonth"
+      width="100%" height="420" toolbar="hidden" hide-tabs iframe-attr-loading="eager">
+    </tableau-viz>
+  </section>
+
   <section class="filters">
     <div class="sync-mini loading" id="sync-mini" aria-hidden="true"><span class="dot"></span><span id="sync-mini-text">Loading data…</span></div>
     <div><label for="f-year">Accounting Year</label><select id="f-year" disabled></select></div>
@@ -226,7 +212,7 @@
   </section>
 
   <h2 class="sec">Office Performance Ranking</h2>
-  <p class="h2sub">All W+K offices ranked on four metrics, <b>YTD through <span id="rk-cutoff">the latest available month</span></b>. The selected office is highlighted in black.</p>
+  <p class="h2sub">All W+K offices ranked on four metrics, <b>YTD through <span id="rk-cutoff">the latest available month</span></b>. The selected office is highlighted.</p>
   <p class="pl-note"><strong>How to read Profit and Profit %.</strong> Each office shows only the Indirect Costs allocated to it. For an individual client, these can differ from the company-level view in Global Client Portfolio.</p>
   <section class="rankings" id="rankings"></section>
 
@@ -235,7 +221,7 @@
   <div class="panel">
     <h3>Revenue by Month and Year</h3>
     <p class="sub">The current year runs through <b id="chart-cutoff">the latest available month</b>; prior year shows <b>all months</b>.</p>
-    <div class="legend"><span><i style="background:#7B7B74"></i><span id="lg-py">Prior year</span></span><span><i style="background:#111111"></i><span id="lg-cy">Current year</span></span></div>
+    <div class="legend"><span><i style="background:var(--c-py)"></i><span id="lg-py">Prior year</span></span><span><i style="background:var(--c-cy)"></i><span id="lg-cy">Current year</span></span></div>
     <div class="chart-box">
       <svg id="chart" viewBox="0 0 1200 330" role="img" aria-label="Revenue by month and year"></svg>
       <div class="chart-tip" id="chart-tip" hidden></div>
@@ -256,26 +242,11 @@
 
   <p class="status err" id="status" hidden></p>
 
-  <section class="source" id="source">
-    <h2>Data source</h2>
-    <p class="note">The Tableau view below feeds everything above. The page reads its data through the Tableau Embedding API and draws the report itself. No Tableau filter is applied: the office selector works inside the page so that the rankings can compare all offices.</p>
-    <tableau-viz id="viz"
-      src="https://prod-useast-a.online.tableau.com/t/wk/views/ProfitabilityPortalData/SRC_CPD_ClientOfficeMonth"
-      width="100%" height="420" toolbar="hidden" hide-tabs iframe-attr-loading="eager">
-    </tableau-viz>
-  </section>
 </main>
 
 <script type="module">
-  // Sticky filters sit just below the sticky nav, whose height changes at the mobile breakpoint.
-  (() => { const nav = document.querySelector(".pnav"); if (!nav) return; const set = () => document.documentElement.style.setProperty("--nav-h", nav.offsetHeight + "px"); set(); new ResizeObserver(set).observe(nav); })();
-  // The client menu in the nav closes when the viewer clicks elsewhere or presses Escape.
-  (() => {
-    const m = document.querySelector(".pnav__menu");
-    if (!m) return;
-    document.addEventListener("click", e => { if (m.open && !m.contains(e.target)) m.open = false; });
-    document.addEventListener("keydown", e => { if (e.key === "Escape" && m.open) { m.open = false; m.querySelector("summary").focus(); } });
-  })();
+  // Chart colors come from the active theme (--c-* in assets/report-theme.css).
+  const TH = new Proxy({}, { get: (_, k) => getComputedStyle(document.documentElement).getPropertyValue("--c-" + k).trim() });
   const viz = document.getElementById("viz");
   const statusEl = document.getElementById("status");
   const yearSel = document.getElementById("f-year");
@@ -806,15 +777,15 @@
     const top = max > 0 ? Math.ceil(max / step) * step : 1;
     const y = v => T + ph - (Math.max(0, v) / top) * ph;
     for (let t = 0; t <= top + 1e-9; t += step) {
-      svg.appendChild(el("text", { x: L - 10, y: y(t) + 4, "text-anchor": "end", "font-size": 12, fill: "#7B7B74" }, fmtMoney(t)));
+      svg.appendChild(el("text", { x: L - 10, y: y(t) + 4, "text-anchor": "end", "font-size": 12, fill: TH.ink3 }, fmtMoney(t)));
     }
     for (let m = 1; m <= 12; m++) {
       const gx = L + (m - 1) * gw;
-      if (m > 1) svg.appendChild(el("line", { x1: gx, x2: gx, y1: T, y2: T + ph, stroke: "#DDDDDA", "stroke-width": 1 }));
-      svg.appendChild(el("text", { x: gx + gw / 2, y: T + ph + 22, "text-anchor": "middle", "font-size": 13, "font-weight": 600, fill: "#111111" }, MONTHS[m - 1]));
+      if (m > 1) svg.appendChild(el("line", { x1: gx, x2: gx, y1: T, y2: T + ph, stroke: TH.gridv, "stroke-width": 1 }));
+      svg.appendChild(el("text", { x: gx + gw / 2, y: T + ph + 22, "text-anchor": "middle", "font-size": 13, "font-weight": 600, fill: TH.ink }, MONTHS[m - 1]));
       const bw = gw * 0.27;
       const pyV = get(pyYear, m), cyV = m <= cutoff ? get(cyYear, m) : null;
-      const bars = [[pyYear, pyV, gx + gw * 0.17, "#7B7B74", null], [cyYear, cyV, gx + gw * 0.56, "#111111", pyV]];
+      const bars = [[pyYear, pyV, gx + gw * 0.17, TH.py, null], [cyYear, cyV, gx + gw * 0.56, TH.cy, pyV]];
       for (const [yr, v, x, c, cmp] of bars) {
         if (v === null) continue;
         const r = el("rect", { x, y: y(v), width: bw, height: Math.max(0, T + ph - y(v)), fill: c, class: "bar" });
@@ -826,10 +797,25 @@
         svg.appendChild(r);
       }
     }
-    svg.appendChild(el("line", { x1: L, x2: W - R, y1: T + ph, y2: T + ph, stroke: "#C9C9C3", "stroke-width": 1 }));
+    svg.appendChild(el("line", { x1: L, x2: W - R, y1: T + ph, y2: T + ph, stroke: TH.zero, "stroke-width": 1 }));
   }
 
   // ---------- wiring ----------
+  const sourceEl = document.getElementById("source");
+  const keepSource = new URLSearchParams(location.search).has("source");   // ?source in the address shows the data source block
+  const SOURCE_TEXT = {
+    signin: ["Sign in to Tableau", "Use the box below to sign in and load the report. This box disappears once the data loads."],
+    error: ["Tableau view", "The Tableau view that feeds the report could not be loaded. Check your access or sign in here."],
+    source: ["Data source", "The Tableau view below feeds everything on this page. The page reads its data through the Tableau Embedding API and draws the report itself. No Tableau filter is applied: the office selector works inside the page so that the rankings can compare all offices."]
+  };
+  const revealSource = reason => {
+    const [t, n] = SOURCE_TEXT[reason || "signin"];
+    document.getElementById("source-title").textContent = t;
+    document.getElementById("source-note").textContent = n;
+    viz.setAttribute("height", reason === "source" ? "420" : "260");   // the sign-in box needs little room; the data view more
+    sourceEl.classList.remove("is-hidden"); sourceEl.removeAttribute("aria-hidden");
+  };
+  if (keepSource) revealSource("source");
   const signinEl = document.getElementById("signin");
   let interactive = false;
   // Tableau shows its sign-in inside the embed; if it hasn't loaded after 5 s, point the viewer to it.
@@ -837,6 +823,7 @@
     if (interactive) return;
     setState("signin", "Sign in to Tableau to load data");
     signinEl.hidden = false;
+    if (!keepSource) revealSource("signin");   // the sign-in box lives inside the Tableau view, shown at the top of the page
   }, 5000);
   document.getElementById("signin-btn").addEventListener("click", () =>
     document.getElementById("source").scrollIntoView({ behavior: "smooth", block: "start" }));
@@ -845,6 +832,7 @@
     interactive = true;
     clearTimeout(signinTimer);
     signinEl.hidden = true;
+    if (!keepSource) { sourceEl.classList.add("is-hidden"); sourceEl.setAttribute("aria-hidden", "true"); }
     if (!loaded) setState("loading", "Loading data…");
     refresh();
   });
@@ -861,8 +849,13 @@
     lastSync = c.time;
     setState("cached", "Saved data from " + lastSync + " · Updating…", facts.length + " fact rows from the local cache");
   })();
-  viz.addEventListener("vizloaderror", e => setState("error", "Error",
-    "Could not load the Tableau view: " + (e.detail && e.detail.message ? e.detail.message : "no detail")));
+  viz.addEventListener("vizloaderror", e => {
+    clearTimeout(signinTimer);
+    signinEl.hidden = true;
+    if (!keepSource) revealSource("error");
+    setState("error", "Error", "Could not load the Tableau view: " + (e.detail && e.detail.message ? e.detail.message : "no detail"));
+  });
+  window.addEventListener("wk-theme", () => { if (loaded) render(); });
 </script>
 </body>
 </html>

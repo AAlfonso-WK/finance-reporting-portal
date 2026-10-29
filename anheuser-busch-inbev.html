@@ -6,6 +6,9 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Anheuser-Busch InBev Profitability</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%23080808'/%3E%3Ctext x='50%25' y='54%25' text-anchor='middle' font-size='18' font-family='Arial' font-weight='700' fill='white'%3EW%2BK%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/portal-shell.css">
+<link rel="stylesheet" href="assets/report-theme.css">
+<script src="assets/portal-shell.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script>
@@ -21,7 +24,6 @@
   document.title = window.CLIENT.name + " Profitability";
   document.documentElement.style.setProperty("--brand", window.CLIENT.brand);
   document.documentElement.style.setProperty("--accent", window.CLIENT.accent);
-  document.documentElement.style.setProperty("--mark", window.CLIENT.mark || window.CLIENT.accent);
   document.documentElement.style.setProperty("--label", window.CLIENT.label || window.CLIENT.accent);
 </script>
 <script type="module" src="https://prod-useast-a.online.tableau.com/javascripts/api/tableau.embedding.3.latest.min.js"></script>
@@ -30,29 +32,10 @@
     --bg: #F2F1ED; --panel: #FCFCFA; --card: #F4F4F2; --band: #F8F8F5;
     --ink: #111111; --ink2: #4F4F4A; --ink3: #7B7B74; --line: #DDDDDA; --line2: #C9C9C3;
     --good: #146B3A; --bad: #B2182B; --good-dark: #5DAE74; --bad-dark: #F4A6A0;
-    --brand: #001A33; --accent: #D4AF37; --mark: #D4AF37; --label: #D4AF37; --head: #0D0D0D;
+    --brand: #001A33; --accent: #D4AF37; --mark: #D4AF37; --label: #D4AF37; --head: #0D0D0D; --c-py: #B7B7B2;
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Archivo", system-ui, sans-serif; font-size: 14px; line-height: 1.45; }
-  .pnav { position: sticky; top: 0; z-index: 200; background: #0A0A0A; border-bottom: 1px solid #2A2A2A; display: flex; align-items: center; justify-content: space-between; gap: 28px; padding: 15px clamp(18px, 4vw, 48px); line-height: 1.5; }
-  .pnav__brand { display: inline-flex; align-items: center; gap: 10px; min-width: max-content; color: #fff; text-decoration: none; font-size: 0.76rem; font-weight: 700; letter-spacing: .12em; line-height: 1; text-transform: uppercase; white-space: nowrap; }
-  .pnav__mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: #F8F8F2; color: #0A0A0A; font-size: 0.64rem; font-weight: 700; letter-spacing: 0; }
-  .pnav__links { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: clamp(10px, 1.8vw, 24px); min-width: 0; }
-  .pnav__links a { font-family: "IBM Plex Mono", Consolas, monospace; font-size: 0.75rem; letter-spacing: .07em; text-transform: uppercase; color: #E7E8E6; text-decoration: none; padding: 8px 16px; border: 1px solid #55554F; border-radius: 999px; transition: background .15s, border-color .15s; }
-  .pnav__links a:hover { background: #2A2A2A; border-color: #A6A6A0; }
-  .pnav__links a[aria-current="page"] { background: #F8F8F2; border-color: #F8F8F2; color: #0A0A0A; font-weight: 600; }
-  .pnav__links a:focus-visible, .pnav__brand:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-  .pnav__menu { position: relative; }
-  .pnav__menu summary { list-style: none; cursor: pointer; font-family: "IBM Plex Mono", Consolas, monospace; font-size: 0.75rem; letter-spacing: .07em; text-transform: uppercase; color: #E7E8E6; padding: 8px 16px; border: 1px solid #55554F; border-radius: 999px; transition: background .15s, border-color .15s; white-space: nowrap; }
-  .pnav__menu summary::-webkit-details-marker { display: none; }
-  .pnav__menu summary::after { content: " \25BE"; }
-  .pnav__menu summary:hover { background: #2A2A2A; border-color: #A6A6A0; }
-  .pnav__menu summary[aria-current="page"] { background: #F8F8F2; border-color: #F8F8F2; color: #0A0A0A; font-weight: 600; }
-  .pnav__menu summary:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-  .pnav__drop { position: absolute; right: 0; top: calc(100% + 6px); min-width: 230px; display: flex; flex-direction: column; gap: 2px; padding: 6px; background: #0A0A0A; border: 1px solid #55554F; border-radius: 12px; box-shadow: 0 4px 14px rgba(0,0,0,.35); }
-  .pnav__drop a { border: 0; border-radius: 8px; padding: 9px 12px; white-space: nowrap; }
-  @media (max-width: 640px) { .pnav { padding: 10px 16px; } .pnav__brand span:last-child { display: none; } }
-  .pnav + .shell { margin-top: 16px; }
   .shell { background: var(--brand); color: #fff; padding: 20px 24px 18px; border-top: 5px solid var(--accent); }
   .shell .brand-label { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--label); }
   .shell h1 { font-size: 30px; font-weight: 800; line-height: 1.15; margin: 4px 0 0; }
@@ -108,7 +91,7 @@
   .delta.pos { color: var(--good-dark); } .delta.neg { color: var(--bad-dark); }
   .delta.na, .delta.neu { color: #C8C7C5; }
 
-  h2.sec { font-size: 26px; font-weight: 800; margin: 28px 12px 2px; scroll-margin-top: calc(var(--nav-h, 68px) + var(--filt-h, 100px) + 8px); }
+  h2.sec { font-size: 26px; font-weight: 800; margin: 28px 12px 2px; scroll-margin-top: calc(var(--nav-h, 0px) + var(--filt-h, 100px) + 8px); }
   .jump { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 18px 12px 0; }
   .jump span { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .02em; color: var(--ink2); margin-right: 4px; }
   .jump a { font-size: 12.5px; font-weight: 600; color: var(--ink); text-decoration: none; padding: 5px 13px; border: 1px solid var(--line2); border-radius: 999px; background: var(--panel); }
@@ -196,7 +179,7 @@
   .mx-detail h4 { margin: 0 0 8px; font-size: 14px; }
   .mx-detail .hint { margin: 0; font-size: 12.5px; color: var(--ink3); }
   .mx-detail .tbl-wrap { max-width: 640px; }
-  .controls.filters { position: sticky; top: var(--nav-h, 68px); z-index: 190; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin: 16px 0 0; padding: 40px 12px 16px; border-bottom: 1px solid var(--line); background: var(--panel); }
+  .controls.filters { position: sticky; top: var(--nav-h, 0px); z-index: 190; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin: 16px 0 0; padding: 40px 12px 16px; border-bottom: 1px solid var(--line); background: var(--panel); }
   .fhint { margin: 10px 12px 0; font-size: 12.5px; color: var(--ink2); }
   .sync-mini { position: absolute; left: 12px; top: 10px; line-height: 1.2; display: none; align-items: center; gap: 7px; max-width: calc(100% - 24px); font-size: 12px; font-weight: 600; color: var(--ink2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   body.sync-hidden .sync-mini { display: flex; }
@@ -243,19 +226,7 @@
   }
 </style>
 </head>
-<body class="is-loading">
-<nav class="pnav" aria-label="Portal">
-  <a class="pnav__brand" href="index.html"><span class="pnav__mark">W+K</span><span>Finance Portal</span></a>
-  <div class="pnav__links">
-    <a href="index.html">Home</a>
-    <a href="global-client-portfolio.html">Global Client Portfolio</a>
-    <a href="office-profitability.html">Office Profitability</a>
-    <details class="pnav__menu">
-      <summary aria-current="page">Client Profitability</summary>
-      <div class="pnav__drop"><a href="anheuser-busch-inbev.html" aria-current="page">Anheuser-Busch InBev</a><a href="eli-lilly.html">Eli Lilly</a><a href="ford.html">Ford</a><a href="kraft-heinz.html">Kraft Heinz</a><a href="mcdonalds.html">McDonald's</a><a href="nike.html">Nike</a></div>
-    </details>
-  </div>
-</nav>
+<body class="is-loading client-report">
 <div class="shell">
   <div class="brand-label">Client Profitability</div>
   <h1 id="client-title">Anheuser-Busch InBev</h1>
@@ -327,7 +298,7 @@
           <p class="sub" id="trend-sub"></p>
         </div>
       </div>
-      <div class="legend"><span><i id="lg-py" style="background:#B7B7B2"></i><span id="lg-py-t">Prior year</span></span><span><i id="lg-cy"></i><span id="lg-cy-t">Current year</span></span><span><i style="background:#B2182B"></i>Negative month</span></div>
+      <div class="legend"><span><i id="lg-py" style="background:var(--c-py)"></i><span id="lg-py-t">Prior year</span></span><span><i id="lg-cy"></i><span id="lg-cy-t">Current year</span></span><span><i style="background:var(--c-neg)"></i>Negative month</span></div>
       <div class="chart-box">
         <svg id="trend" viewBox="0 0 640 300" role="img" aria-label="Revenue by month, current year against prior year"></svg>
         <div class="chart-tip" id="trend-tip" hidden></div>
@@ -384,7 +355,7 @@
         <div class="controls one"><div><label for="f-opmode">View</label>
           <select id="f-opmode" disabled><option value="month" selected>Monthly</option><option value="cum">Cumulative</option></select></div></div>
       </div>
-      <div class="legend"><span><i id="lg2-py" style="background:#B7B7B2"></i><span id="lg2-py-t">Prior year</span></span><span><i id="lg2-cy"></i><span id="lg2-cy-t">Current year</span></span><span id="lg2-neg"><i style="background:#B2182B"></i>Negative month</span></div>
+      <div class="legend"><span><i id="lg2-py" style="background:var(--c-py)"></i><span id="lg2-py-t">Prior year</span></span><span><i id="lg2-cy"></i><span id="lg2-cy-t">Current year</span></span><span id="lg2-neg"><i style="background:var(--c-neg)"></i>Negative month</span></div>
       <div class="chart-box">
         <svg id="optrend" viewBox="0 0 640 300" role="img" aria-label="Operating Profit by month, current year against prior year"></svg>
         <div class="chart-tip" id="op-tip" hidden></div>
@@ -435,18 +406,35 @@
 
 <script type="module">
   const CLIENT = window.CLIENT;
-  // The client menu in the nav closes when the viewer clicks elsewhere or presses Escape.
+  // Chart colors come from the active theme (--c-* in assets/report-theme.css); the current-year, dot and mark colors
+  // depend on the client, so they are set here and again whenever the theme changes.
+  const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const TH = new Proxy({}, { get: (_, k) => cssVar("--c-" + k) });
+  const isDark = () => document.documentElement.dataset.theme === "dark";
+  // A brand color that is too dark to read on the dark page is lightened toward white (a near-neutral one becomes the page ink).
+  function onDark(hex) {
+    const n = parseInt(hex.slice(1), 16), c = [n >> 16 & 255, n >> 8 & 255, n & 255];
+    const lum = v => { const q = v.map(x => { x /= 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); }); return 0.2126 * q[0] + 0.7152 * q[1] + 0.0722 * q[2]; };
+    if (Math.max(...c) - Math.min(...c) < 24) return lum(c) < 0.25 ? "#E8E8E2" : hex;
+    let k = c, t = 0;
+    while (lum(k) < 0.22 && t < 1) { t += 0.05; k = c.map(x => Math.round(x + (255 - x) * t)); }
+    return "#" + k.map(x => x.toString(16).padStart(2, "0")).join("");
+  }
+  function applyBrand() {
+    const r = document.documentElement.style, d = isDark(), fit = c => d ? onDark(c) : c;
+    r.setProperty("--c-cy", d ? "#F2F2EC" : CLIENT.brand);
+    r.setProperty("--c-dot", fit(CLIENT.dot || CLIENT.accent));
+    r.setProperty("--c-dotstroke", d ? "#0B0B0B" : CLIENT.brand);
+    r.setProperty("--mark", fit(CLIENT.mark || CLIENT.accent));
+  }
+  applyBrand();
+  window.addEventListener("wk-theme", () => { applyBrand(); if (facts.length) render(); });
+  // Anchors clear the sticky filter bar, whose height is measured here.
   (() => {
-    const m = document.querySelector(".pnav__menu");
-    if (!m) return;
-    document.addEventListener("click", e => { if (m.open && !m.contains(e.target)) m.open = false; });
-    document.addEventListener("keydown", e => { if (e.key === "Escape" && m.open) { m.open = false; m.querySelector("summary").focus(); } });
-  })();
-  // The sticky filter bar sits just below the sticky nav (whose height changes at the mobile breakpoint); anchors clear both.
-  (() => {
-    const nav = document.querySelector(".pnav"), bar = document.querySelector(".filters");
-    const set = () => { const r = document.documentElement.style; if (nav) r.setProperty("--nav-h", nav.offsetHeight + "px"); if (bar) r.setProperty("--filt-h", bar.offsetHeight + "px"); };
-    set(); const ro = new ResizeObserver(set); if (nav) ro.observe(nav); if (bar) ro.observe(bar);
+    const bar = document.querySelector(".filters");
+    if (!bar) return;
+    const set = () => document.documentElement.style.setProperty("--filt-h", bar.offsetHeight + "px");
+    set(); new ResizeObserver(set).observe(bar);
   })();
   const ROOT = "WKI";   // the client total comes from the WKI row; office rows are the parent offices
   document.getElementById("client-title").textContent = CLIENT.name;
@@ -994,7 +982,7 @@
     const svg = document.getElementById("scatter");
     svg.replaceChildren(); tip.hidden = true;
     const pts = offices.map(x => ({ office: x.office, x: x.cy[pk], y: x.cy[sk] })).filter(p => p.x !== null && p.y !== null && isFinite(p.x) && isFinite(p.y));
-    if (!pts.length) { svg.appendChild(el("text", { x: 300, y: 180, "text-anchor": "middle", "font-size": 13, fill: "#7B7B74" }, "No offices to plot.")); return; }
+    if (!pts.length) { svg.appendChild(el("text", { x: 300, y: 180, "text-anchor": "middle", "font-size": 13, fill: TH.ink3 }, "No offices to plot.")); return; }
     const W = 600, H = 360, L = 64, R = 24, T = 14, B = 46;
     const pw = W - L - R, ph = H - T - B;
     const xt = ticks(Math.min(...pts.map(p => p.x)), Math.max(...pts.map(p => p.x)), 1);
@@ -1003,23 +991,23 @@
     const X = v => L + (v - x0) / (x1 - x0 || 1) * pw;
     const Y = v => T + ph - (v - y0) / (y1 - y0 || 1) * ph;
     // Negative zones: a light red tint left of zero (x) and below zero (y); where both overlap it is slightly stronger.
-    const NEG = "#B2182B";
+    const NEG = TH.neg;
     if (x0 < 0) svg.appendChild(el("rect", { x: X(x0), y: T, width: X(0) - X(x0), height: ph, fill: NEG, "fill-opacity": 0.07 }));
     if (y0 < 0) svg.appendChild(el("rect", { x: L, y: Y(0), width: pw, height: Y(y0) - Y(0), fill: NEG, "fill-opacity": 0.07 }));
     yt.forEach(t => {
-      svg.appendChild(el("line", { x1: L, x2: W - R, y1: Y(t), y2: Y(t), stroke: t === 0 ? "#C9C9C3" : "#E6E6E2", "stroke-width": 1 }));
-      svg.appendChild(el("text", { x: L - 8, y: Y(t) + 4, "text-anchor": "end", "font-size": 11.5, fill: t < 0 ? NEG : "#7B7B74" }, fmtPct(t).replace(".0%", "%")));
+      svg.appendChild(el("line", { x1: L, x2: W - R, y1: Y(t), y2: Y(t), stroke: t === 0 ? TH.zero : TH.grid, "stroke-width": 1 }));
+      svg.appendChild(el("text", { x: L - 8, y: Y(t) + 4, "text-anchor": "end", "font-size": 11.5, fill: t < 0 ? NEG : TH.ink3 }, fmtPct(t).replace(".0%", "%")));
     });
     xt.forEach(t => {
-      svg.appendChild(el("line", { x1: X(t), x2: X(t), y1: T, y2: T + ph, stroke: t === 0 ? "#C9C9C3" : "#E6E6E2", "stroke-width": 1 }));
-      svg.appendChild(el("text", { x: X(t), y: T + ph + 16, "text-anchor": "middle", "font-size": 11.5, fill: t < 0 ? NEG : "#7B7B74" }, fmtMoney(t)));
+      svg.appendChild(el("line", { x1: X(t), x2: X(t), y1: T, y2: T + ph, stroke: t === 0 ? TH.zero : TH.grid, "stroke-width": 1 }));
+      svg.appendChild(el("text", { x: X(t), y: T + ph + 16, "text-anchor": "middle", "font-size": 11.5, fill: t < 0 ? NEG : TH.ink3 }, fmtMoney(t)));
     });
-    svg.appendChild(el("text", { x: L + pw / 2, y: H - 6, "text-anchor": "middle", "font-size": 12, "font-weight": 600, fill: "#4F4F4A" }, PRIMARY[pk].label));
-    svg.appendChild(el("text", { x: 14, y: T + ph / 2, "text-anchor": "middle", "font-size": 12, "font-weight": 600, fill: "#4F4F4A", transform: "rotate(-90 14 " + (T + ph / 2) + ")" }, SECONDARY[sk].label));
+    svg.appendChild(el("text", { x: L + pw / 2, y: H - 6, "text-anchor": "middle", "font-size": 12, "font-weight": 600, fill: TH.ink2 }, PRIMARY[pk].label));
+    svg.appendChild(el("text", { x: 14, y: T + ph / 2, "text-anchor": "middle", "font-size": 12, "font-weight": 600, fill: TH.ink2, transform: "rotate(-90 14 " + (T + ph / 2) + ")" }, SECONDARY[sk].label));
     pts.forEach(p => {
       const cx = X(p.x), cyy = Y(p.y);
       const hit = isSel(p.office), dim = focused() && !hit;
-      const c = el("circle", { cx, cy: cyy, r: hit ? 8.5 : 6.5, fill: CLIENT.dot || CLIENT.accent, "fill-opacity": dim ? 0.45 : 1, stroke: hit ? "#111111" : CLIENT.brand, "stroke-width": hit ? 2.4 : 1.2, class: "dot" });
+      const c = el("circle", { cx, cy: cyy, r: hit ? 8.5 : 6.5, fill: TH.dot, "fill-opacity": dim ? 0.45 : 1, stroke: hit ? TH.ink : TH.dotstroke, "stroke-width": hit ? 2.4 : 1.2, class: "dot" });
       c.addEventListener("mouseenter", () => {
         tip.replaceChildren();
         const t = document.createElement("div"); t.className = "t"; t.textContent = p.office;
@@ -1031,7 +1019,7 @@
       c.addEventListener("mouseleave", () => { tip.hidden = true; });
       svg.appendChild(c);
       const right = cx > L + pw * 0.78;
-      svg.appendChild(el("text", { x: right ? cx - 10 : cx + 10, y: cyy + 4, "text-anchor": right ? "end" : "start", "font-size": 12, "font-weight": isSel(p.office) ? 700 : 400, fill: p.x < 0 || p.y < 0 ? NEG : "#111111" }, p.office));
+      svg.appendChild(el("text", { x: right ? cx - 10 : cx + 10, y: cyy + 4, "text-anchor": right ? "end" : "start", "font-size": 12, "font-weight": isSel(p.office) ? 700 : 400, fill: p.x < 0 || p.y < 0 ? NEG : TH.ink }, p.office));
     });
   }
 
@@ -1122,7 +1110,7 @@
     svg.replaceChildren(); trendTip.hidden = true;
     document.getElementById("trend-title").textContent = "Revenue by Month" + (focused() ? ", " + scopeName() : "");
     document.getElementById("trend-sub").textContent = cyYear + " runs through " + MONTHS[cutoff - 1] + "; " + pyYear + " shows all months. A month with no record has no bar.";
-    document.getElementById("lg-cy").style.background = CLIENT.brand;
+    document.getElementById("lg-cy").style.background = TH.cy;
     document.getElementById("lg-py-t").textContent = pyYear;
     document.getElementById("lg-cy-t").textContent = cyYear;
 
@@ -1137,20 +1125,20 @@
     }
     if (anyBad) document.getElementById("trend-sub").textContent += " Months where the source has no Revenue value are not drawn.";
     const vals = [...pyV, ...cyV].filter(v => v !== null && v !== undefined);
-    if (!vals.length) { svg.appendChild(el("text", { x: W / 2, y: H / 2, "text-anchor": "middle", "font-size": 13, fill: "#7B7B74" }, "No Revenue records for this scope.")); }
+    if (!vals.length) { svg.appendChild(el("text", { x: W / 2, y: H / 2, "text-anchor": "middle", "font-size": 13, fill: TH.ink3 }, "No Revenue records for this scope.")); }
     else {
-      const NEG = "#B2182B";
+      const NEG = TH.neg;
       const t = ticks(Math.min(...vals), Math.max(...vals), 1);
       const lo = t[0], hi = t[t.length - 1];
       const Y = v => T + ph - (v - lo) / (hi - lo || 1) * ph;
       t.forEach(v => {
-        svg.appendChild(el("line", { x1: L, x2: W - R, y1: Y(v), y2: Y(v), stroke: v === 0 ? "#7B7B74" : "#E6E6E2", "stroke-width": v === 0 ? 1.2 : 1 }));
-        svg.appendChild(el("text", { x: L - 8, y: Y(v) + 4, "text-anchor": "end", "font-size": 11.5, fill: v < 0 ? NEG : "#7B7B74" }, fmtMoney(v)));
+        svg.appendChild(el("line", { x1: L, x2: W - R, y1: Y(v), y2: Y(v), stroke: v === 0 ? TH.ink3 : TH.grid, "stroke-width": v === 0 ? 1.2 : 1 }));
+        svg.appendChild(el("text", { x: L - 8, y: Y(v) + 4, "text-anchor": "end", "font-size": 11.5, fill: v < 0 ? NEG : TH.ink3 }, fmtMoney(v)));
       });
       for (let m = 1; m <= 12; m++) {
         const gx = L + (m - 1) * gw, bw = gw * 0.32;
-        svg.appendChild(el("text", { x: gx + gw / 2, y: T + ph + 18, "text-anchor": "middle", "font-size": 11.5, "font-weight": 600, fill: "#111111" }, MONTHS[m - 1].slice(0, 3)));
-        [[pyYear, pyV[m], gx + gw * 0.14, "#B7B7B2", null], [cyYear, cyV[m], gx + gw * 0.54, CLIENT.brand, pyV[m]]].forEach(([yr, v, x, color, cmp]) => {
+        svg.appendChild(el("text", { x: gx + gw / 2, y: T + ph + 18, "text-anchor": "middle", "font-size": 11.5, "font-weight": 600, fill: TH.ink }, MONTHS[m - 1].slice(0, 3)));
+        [[pyYear, pyV[m], gx + gw * 0.14, TH.py, null], [cyYear, cyV[m], gx + gw * 0.54, TH.cy, pyV[m]]].forEach(([yr, v, x, color, cmp]) => {
           if (v === null || v === undefined) return;
           const neg = v < -0.5;
           const y0 = Y(0), y1 = Y(v);
@@ -1240,7 +1228,7 @@
     return any ? derive(s) : null;
   }
   function unavailable(svg, w, h, text) {
-    svg.appendChild(el("text", { x: w / 2, y: h / 2, "text-anchor": "middle", "font-size": 13, fill: "#7B7B74" }, text));
+    svg.appendChild(el("text", { x: w / 2, y: h / 2, "text-anchor": "middle", "font-size": 13, fill: TH.ink3 }, text));
   }
 
   // ---------- Profit Bridge: change in profit against the prior year ----------
@@ -1286,26 +1274,26 @@
     }
 
     const W = 640, H = 310, L = 58, R = 6, T = 22, B = 46, pw = W - L - R, ph = H - T - B, gw = pw / bars.length, bw = Math.min(gw * 0.68, 78);
-    const NEG = "#B2182B";
+    const NEG = TH.neg;
     const ends = bars.flatMap(b => b.total ? [0, b.v] : [b.a, b.b]);
     const t = ticks(Math.min(...ends), Math.max(...ends), 1);
     const lo = t[0], hi = t[t.length - 1];
     const Y = v => T + ph - (v - lo) / (hi - lo || 1) * ph;
     t.forEach(v => {
-      svg.appendChild(el("line", { x1: L, x2: W - R, y1: Y(v), y2: Y(v), stroke: v === 0 ? "#7B7B74" : "#E6E6E2", "stroke-width": v === 0 ? 1.2 : 1 }));
-      svg.appendChild(el("text", { x: L - 8, y: Y(v) + 4, "text-anchor": "end", "font-size": 11.5, fill: v < 0 ? NEG : "#7B7B74" }, fmtMoney(v)));
+      svg.appendChild(el("line", { x1: L, x2: W - R, y1: Y(v), y2: Y(v), stroke: v === 0 ? TH.ink3 : TH.grid, "stroke-width": v === 0 ? 1.2 : 1 }));
+      svg.appendChild(el("text", { x: L - 8, y: Y(v) + 4, "text-anchor": "end", "font-size": 11.5, fill: v < 0 ? NEG : TH.ink3 }, fmtMoney(v)));
     });
     bars.forEach((b, i) => {
       const a = b.total ? 0 : b.a, e = b.total ? b.v : b.b, x = L + i * gw + (gw - bw) / 2;
-      if (i < bars.length - 1) svg.appendChild(el("line", { x1: x + bw, x2: L + (i + 1) * gw + (gw - bw) / 2, y1: Y(e), y2: Y(e), stroke: "#A6A6A0", "stroke-width": 1 }));
-      const fill = b.total ? CLIENT.brand : b.other ? "#7B7B74" : b.d >= 0 ? "#146B3A" : NEG;
+      if (i < bars.length - 1) svg.appendChild(el("line", { x1: x + bw, x2: L + (i + 1) * gw + (gw - bw) / 2, y1: Y(e), y2: Y(e), stroke: TH.conn, "stroke-width": 1 }));
+      const fill = b.total ? TH.cy : b.other ? TH.ink3 : b.d >= 0 ? TH.good : NEG;
       const r = el("rect", { x, y: Math.min(Y(a), Y(e)), width: bw, height: Math.max(1, Math.abs(Y(a) - Y(e))), fill, "fill-opacity": b.total ? 1 : 0.8, class: "bar" });
       hoverTip(r, bridgeTip, b.total ? [b.l.join(" "), fmtUsdSigned(b.v), b.det] : [b.l.join(" "), "Effect on profit " + fmtUsdSigned(b.d), b.det]);
       svg.appendChild(r);
       // the value goes above a bar that rises or sits on zero, and below a bar that ends under zero
       const down = e < a || (b.total && b.v < 0);
-      svg.appendChild(el("text", { x: x + bw / 2, y: down ? Math.max(Y(a), Y(e)) + 14 : Math.min(Y(a), Y(e)) - 5, "text-anchor": "middle", "font-size": 11.5, "font-weight": 600, fill: "#111111" }, sgnMoney(b.total ? b.v : b.d)));
-      b.l.forEach((line, j) => svg.appendChild(el("text", { x: x + bw / 2, y: T + ph + 16 + j * 13, "text-anchor": "middle", "font-size": 11.5, "font-weight": 600, fill: "#111111" }, line)));
+      svg.appendChild(el("text", { x: x + bw / 2, y: down ? Math.max(Y(a), Y(e)) + 14 : Math.min(Y(a), Y(e)) - 5, "text-anchor": "middle", "font-size": 11.5, "font-weight": 600, fill: TH.ink }, sgnMoney(b.total ? b.v : b.d)));
+      b.l.forEach((line, j) => svg.appendChild(el("text", { x: x + bw / 2, y: T + ph + 16 + j * 13, "text-anchor": "middle", "font-size": 11.5, "font-weight": 600, fill: TH.ink }, line)));
     });
     recon.textContent = "Revenue " + fmtUsdSigned(dRev) + ", Gross Profit " + fmtUsdSigned(dGp) + (client ? ", Operating Profit " + fmtUsdSigned(dOp) : "") + ". The steps add up to each change."
       + (showOther ? " “Other” (" + fmtUsdSigned(other) + ") is the gap between the reported Gross Profit and Revenue less Direct Labour and Direct Overheads." : "")
@@ -1331,13 +1319,13 @@
       ? "Recorded Operating Profit adding up month by month, " + cyYear + " against " + pyYear + ". It is not cash flow or a forecast. A month without a value stops the line."
       : cyYear + " runs through " + MONTHS[cutoff - 1] + "; " + pyYear + " shows all months. A month with no record has no bar.";
     if (focused()) document.getElementById("op-sub").textContent += " Office Operating Profit is allocated and does not add up to the client total.";
-    document.getElementById("lg2-cy").style.background = CLIENT.brand;
+    document.getElementById("lg2-cy").style.background = TH.cy;
     document.getElementById("lg2-py-t").textContent = pyYear;
     document.getElementById("lg2-cy-t").textContent = cyYear;
     document.getElementById("lg2-neg").hidden = cum;
 
     const W = 640, H = 300, L = 58, R = 6, T = 22, B = 28, pw = W - L - R, ph = H - T - B, gw = pw / 12;
-    const NEG = "#B2182B";
+    const NEG = TH.neg;
     const vals = [...pyS, ...cyS].filter(v => v !== null && v !== undefined);
     if (!vals.length) unavailable(svg, W, H, "No Operating Profit values.");
     else {
@@ -1345,15 +1333,15 @@
       const lo = t[0], hi = t[t.length - 1];
       const Y = v => T + ph - (v - lo) / (hi - lo || 1) * ph;
       t.forEach(v => {
-        svg.appendChild(el("line", { x1: L, x2: W - R, y1: Y(v), y2: Y(v), stroke: v === 0 ? "#7B7B74" : "#E6E6E2", "stroke-width": v === 0 ? 1.2 : 1 }));
-        svg.appendChild(el("text", { x: L - 8, y: Y(v) + 4, "text-anchor": "end", "font-size": 11.5, fill: v < 0 ? NEG : "#7B7B74" }, fmtMoney(v)));
+        svg.appendChild(el("line", { x1: L, x2: W - R, y1: Y(v), y2: Y(v), stroke: v === 0 ? TH.ink3 : TH.grid, "stroke-width": v === 0 ? 1.2 : 1 }));
+        svg.appendChild(el("text", { x: L - 8, y: Y(v) + 4, "text-anchor": "end", "font-size": 11.5, fill: v < 0 ? NEG : TH.ink3 }, fmtMoney(v)));
       });
-      for (let m = 1; m <= 12; m++) svg.appendChild(el("text", { x: L + (m - 0.5) * gw, y: T + ph + 18, "text-anchor": "middle", "font-size": 11.5, "font-weight": 600, fill: "#111111" }, MONTHS[m - 1].slice(0, 3)));
+      for (let m = 1; m <= 12; m++) svg.appendChild(el("text", { x: L + (m - 0.5) * gw, y: T + ph + 18, "text-anchor": "middle", "font-size": 11.5, "font-weight": 600, fill: TH.ink }, MONTHS[m - 1].slice(0, 3)));
       const tipLines = (yr, m, v, monthly) => cum ? [MONTHS[m - 1] + " " + yr, "Cumulative Operating Profit " + fmtUsd(v), "Month: " + fmtUsd(monthly)] : [MONTHS[m - 1] + " " + yr, "Operating Profit " + fmtUsd(v)];
       if (!cum) {
         for (let m = 1; m <= 12; m++) {
           const gx = L + (m - 1) * gw, bw = gw * 0.32;
-          [[pyYear, pyS[m], gx + gw * 0.14, "#B7B7B2", null], [cyYear, cyS[m], gx + gw * 0.54, CLIENT.brand, pyS[m]]].forEach(([yr, v, x, color, cmp]) => {
+          [[pyYear, pyS[m], gx + gw * 0.14, TH.py, null], [cyYear, cyS[m], gx + gw * 0.54, TH.cy, pyS[m]]].forEach(([yr, v, x, color, cmp]) => {
             if (v === null || v === undefined) return;
             const neg = v < -0.5, y0 = Y(0), y1 = Y(v);
             const r = el("rect", { x, y: Math.min(y0, y1), width: bw, height: Math.max(1, Math.abs(y1 - y0)), fill: neg ? NEG : color, "fill-opacity": neg && yr === pyYear ? 0.5 : 1, class: "bar" });
@@ -1382,10 +1370,10 @@
             hoverTip(c, opTip, tipLines(yr, m, v, monthly[m]));
             svg.appendChild(c);
           }
-          if (label) svg.appendChild(el("text", { x: last.x, y: Y(last.v) - 9, "text-anchor": last.x > W - 40 ? "end" : "middle", "font-size": 11.5, "font-weight": 700, fill: "#111111" }, fmtMoney(last.v)));
+          if (label) svg.appendChild(el("text", { x: last.x, y: Y(last.v) - 9, "text-anchor": last.x > W - 40 ? "end" : "middle", "font-size": 11.5, "font-weight": 700, fill: TH.ink }, fmtMoney(last.v)));
         };
-        line(pyS, pyM, "#B7B7B2", 2, pyYear, false);
-        line(cyS, cyM, CLIENT.brand, 2.6, cyYear, true);
+        line(pyS, pyM, TH.py, 2, pyYear, false);
+        line(cyS, cyM, TH.cy, 2.6, cyYear, true);
       }
     }
 
