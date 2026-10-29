@@ -17,7 +17,7 @@
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Archivo", system-ui, sans-serif; font-size: 14px; line-height: 1.45; }
-  .pnav { position: sticky; top: 0; z-index: 100; background: #0A0A0A; border-bottom: 1px solid #2A2A2A; display: flex; align-items: center; justify-content: space-between; gap: 28px; padding: 15px clamp(18px, 4vw, 48px); line-height: 1.5; }
+  .pnav { position: sticky; top: 0; z-index: 200; background: #0A0A0A; border-bottom: 1px solid #2A2A2A; display: flex; align-items: center; justify-content: space-between; gap: 28px; padding: 15px clamp(18px, 4vw, 48px); line-height: 1.5; }
   .pnav__brand { display: inline-flex; align-items: center; gap: 10px; min-width: max-content; color: #fff; text-decoration: none; font-size: 0.76rem; font-weight: 700; letter-spacing: .12em; line-height: 1; text-transform: uppercase; white-space: nowrap; }
   .pnav__mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: #F8F8F2; color: #0A0A0A; font-size: 0.64rem; font-weight: 700; letter-spacing: 0; }
   .pnav__links { display: flex; align-items: center; justify-content: flex-end; gap: clamp(10px, 1.8vw, 24px); min-width: 0; }
@@ -25,6 +25,14 @@
   .pnav__links a:hover { background: #2A2A2A; border-color: #A6A6A0; }
   .pnav__links a[aria-current="page"] { background: #F8F8F2; border-color: #F8F8F2; color: #0A0A0A; font-weight: 600; }
   .pnav__links a:focus-visible, .pnav__brand:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  .pnav__menu { position: relative; }
+  .pnav__menu summary { list-style: none; cursor: pointer; font-family: "IBM Plex Mono", Consolas, monospace; font-size: 0.75rem; letter-spacing: .07em; text-transform: uppercase; color: #E7E8E6; padding: 8px 16px; border: 1px solid #55554F; border-radius: 999px; transition: background .15s, border-color .15s; white-space: nowrap; }
+  .pnav__menu summary::-webkit-details-marker { display: none; }
+  .pnav__menu summary::after { content: " \25BE"; }
+  .pnav__menu summary:hover { background: #2A2A2A; border-color: #A6A6A0; }
+  .pnav__menu summary:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  .pnav__drop { position: absolute; right: 0; top: calc(100% + 6px); min-width: 230px; display: flex; flex-direction: column; gap: 2px; padding: 6px; background: #0A0A0A; border: 1px solid #55554F; border-radius: 12px; box-shadow: 0 4px 14px rgba(0,0,0,.35); }
+  .pnav__drop a { border: 0; border-radius: 8px; padding: 9px 12px; white-space: nowrap; }
   @media (max-width: 640px) { .pnav { padding: 10px 16px; } .pnav__brand span:last-child { display: none; } }
   .pnav + .shell { padding-top: 16px; }
   .shell { background: #0A0A0A; color: #fff; padding: 20px 24px 18px; }
@@ -180,6 +188,10 @@
     <a href="index.html">Home</a>
     <a href="global-client-portfolio.html">Global Client Portfolio</a>
     <a href="office-profitability.html" aria-current="page">Office Profitability</a>
+    <details class="pnav__menu">
+      <summary>Client Profitability</summary>
+      <div class="pnav__drop"><a href="anheuser-busch-inbev.html">Anheuser-Busch InBev</a><a href="eli-lilly.html">Eli Lilly</a><a href="ford.html">Ford</a><a href="kraft-heinz.html">Kraft Heinz</a><a href="mcdonalds.html">McDonald's</a><a href="nike.html">Nike</a></div>
+    </details>
   </div>
 </nav>
 <div class="shell">
@@ -257,6 +269,13 @@
 <script type="module">
   // Sticky filters sit just below the sticky nav, whose height changes at the mobile breakpoint.
   (() => { const nav = document.querySelector(".pnav"); if (!nav) return; const set = () => document.documentElement.style.setProperty("--nav-h", nav.offsetHeight + "px"); set(); new ResizeObserver(set).observe(nav); })();
+  // The client menu in the nav closes when the viewer clicks elsewhere or presses Escape.
+  (() => {
+    const m = document.querySelector(".pnav__menu");
+    if (!m) return;
+    document.addEventListener("click", e => { if (m.open && !m.contains(e.target)) m.open = false; });
+    document.addEventListener("keydown", e => { if (e.key === "Escape" && m.open) { m.open = false; m.querySelector("summary").focus(); } });
+  })();
   const viz = document.getElementById("viz");
   const statusEl = document.getElementById("status");
   const yearSel = document.getElementById("f-year");

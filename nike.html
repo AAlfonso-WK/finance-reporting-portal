@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Nike Profitability</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%23080808'/%3E%3Ctext x='50%25' y='54%25' text-anchor='middle' font-size='18' font-family='Arial' font-weight='700' fill='white'%3EW%2BK%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>
+  // CLIENT CONFIG: the only block to edit when cloning this page for another client.
+  //   key    = the client's exact name in the data (ReportingClient)
+  //   name   = the name shown on the page
+  //   brand  = the client's primary (dark) color, used for the header band and the KPI cards
+  //   accent = the client's accent color, used for the header strip, the KPI card strip and the panel borders
+  //   mark   = (optional) fill of the ranking bars; defaults to accent
+  //   dot    = (optional) fill of the scatter dots; defaults to accent
+  //   label  = (optional) color of the small "Client Profitability" label in the header; defaults to accent
+  window.CLIENT = { key: "Nike", name: "Nike", brand: "#0D0D0D", accent: "#C5F015", mark: "#111111", dot: "#111111" };
+  document.title = window.CLIENT.name + " Profitability";
+  document.documentElement.style.setProperty("--brand", window.CLIENT.brand);
+  document.documentElement.style.setProperty("--accent", window.CLIENT.accent);
+  document.documentElement.style.setProperty("--mark", window.CLIENT.mark || window.CLIENT.accent);
+  document.documentElement.style.setProperty("--label", window.CLIENT.label || window.CLIENT.accent);
+</script>
+<script type="module" src="https://prod-useast-a.online.tableau.com/javascripts/api/tableau.embedding.3.latest.min.js"></script>
+<style>
+  :root {
+    --bg: #F2F1ED; --panel: #FCFCFA; --card: #F4F4F2; --band: #F8F8F5;
+    --ink: #111111; --ink2: #4F4F4A; --ink3: #7B7B74; --line: #DDDDDA; --line2: #C9C9C3;
+    --good: #146B3A; --bad: #B2182B; --good-dark: #5DAE74; --bad-dark: #F4A6A0;
+    --brand: #001A33; --accent: #D4AF37; --mark: #D4AF37; --label: #D4AF37; --head: #0D0D0D;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Archivo", system-ui, sans-serif; font-size: 14px; line-height: 1.45; }
+  .pnav { position: sticky; top: 0; z-index: 200; background: #0A0A0A; border-bottom: 1px solid #2A2A2A; display: flex; align-items: center; justify-content: space-between; gap: 28px; padding: 15px clamp(18px, 4vw, 48px); line-height: 1.5; }
+  .pnav__brand { display: inline-flex; align-items: center; gap: 10px; min-width: max-content; color: #fff; text-decoration: none; font-size: 0.76rem; font-weight: 700; letter-spacing: .12em; line-height: 1; text-transform: uppercase; white-space: nowrap; }
+  .pnav__mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: #F8F8F2; color: #0A0A0A; font-size: 0.64rem; font-weight: 700; letter-spacing: 0; }
+  .pnav__links { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: clamp(10px, 1.8vw, 24px); min-width: 0; }
+  .pnav__links a { font-family: "IBM Plex Mono", Consolas, monospace; font-size: 0.75rem; letter-spacing: .07em; text-transform: uppercase; color: #E7E8E6; text-decoration: none; padding: 8px 16px; border: 1px solid #55554F; border-radius: 999px; transition: background .15s, border-color .15s; }
+  .pnav__links a:hover { background: #2A2A2A; border-color: #A6A6A0; }
+  .pnav__links a[aria-current="page"] { background: #F8F8F2; border-color: #F8F8F2; color: #0A0A0A; font-weight: 600; }
+  .pnav__links a:focus-visible, .pnav__brand:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  .pnav__menu { position: relative; }
+  .pnav__menu summary { list-style: none; cursor: pointer; font-family: "IBM Plex Mono", Consolas, monospace; font-size: 0.75rem; letter-spacing: .07em; text-transform: uppercase; color: #E7E8E6; padding: 8px 16px; border: 1px solid #55554F; border-radius: 999px; transition: background .15s, border-color .15s; white-space: nowrap; }
+  .pnav__menu summary::-webkit-details-marker { display: none; }
+  .pnav__menu summary::after { content: " \25BE"; }
+  .pnav__menu summary:hover { background: #2A2A2A; border-color: #A6A6A0; }
+  .pnav__menu summary[aria-current="page"] { background: #F8F8F2; border-color: #F8F8F2; color: #0A0A0A; font-weight: 600; }
+  .pnav__menu summary:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  .pnav__drop { position: absolute; right: 0; top: calc(100% + 6px); min-width: 230px; display: flex; flex-direction: column; gap: 2px; padding: 6px; background: #0A0A0A; border: 1px solid #55554F; border-radius: 12px; box-shadow: 0 4px 14px rgba(0,0,0,.35); }
+  .pnav__drop a { border: 0; border-radius: 8px; padding: 9px 12px; white-space: nowrap; }
+  @media (max-width: 640px) { .pnav { padding: 10px 16px; } .pnav__brand span:last-child { display: none; } }
+  .pnav + .shell { margin-top: 16px; }
+  .shell { background: var(--brand); color: #fff; padding: 20px 24px 18px; border-top: 5px solid var(--accent); }
+  .shell .brand-label { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--label); }
+  .shell h1 { font-size: 30px; font-weight: 800; line-height: 1.15; margin: 4px 0 0; }
+  .sync { display: inline-flex; align-items: center; gap: 9px; margin-top: 12px; padding: 6px 14px 6px 12px; border: 1px solid rgba(255,255,255,.28); border-radius: 999px; background: rgba(255,255,255,.08); font-weight: 600; font-size: 14px; color: #FFFFFF; cursor: default; }
+  .sync .dot { width: 10px; height: 10px; border-radius: 50%; background: #A6A6A0; flex: none; }
+  .sync.loading .dot, .sync.updating .dot, .sync.signin .dot, .sync.cached .dot { background: #FF6B5F; animation: pulse .8s ease-in-out infinite; }
+  .sync.loading, .sync.updating, .sync.signin, .sync.cached { border-color: #FF6B5F; }
+  .signin { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 16px; margin-top: 12px; font-size: 14px; color: #E7E8E6; }
+  .signin[hidden] { display: none; }
+  .signin button { font: inherit; font-weight: 700; padding: 8px 16px; background: #FFFFFF; color: #111111; border: 0; border-radius: 3px; cursor: pointer; }
+  .signin button:focus-visible { outline: 2px solid #FFFFFF; outline-offset: 2px; }
+  .sync.ready .dot { background: #4ADE80; }
+  .sync.error .dot { background: #FF6B5F; }
+  .sync.error { color: #FF6B5F; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+
+  body.is-loading .kpi .v, body.is-loading .kpi .row span { color: transparent !important; background: rgba(255,255,255,.14); border-radius: 2px; }
+  body.is-loading .kpi .v { width: 62%; }
+  body.is-loading .kpi .row span { min-width: 60px; min-height: 16px; display: inline-block; }
+  body.is-updating .kpis { opacity: .45; transition: opacity .15s; }
+  main { max-width: 1480px; margin: 0 auto; padding: 0 0 48px; }
+
+  .controls { display: grid; grid-template-columns: repeat(2, minmax(0, 320px)); gap: 20px; padding: 0 12px; margin: 0 0 14px; }
+  .controls.one { grid-template-columns: minmax(0, 260px); padding: 0; margin: 0; }
+  .controls .hint { grid-column: 1 / -1; margin: -4px 0 0; font-size: 12.5px; color: var(--ink2); }
+  .controls label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--ink2); margin-bottom: 3px; letter-spacing: .02em; }
+  .controls { --chev: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23111111' stroke-width='2'/%3E%3C/svg%3E"); --chev-off: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%237B7B74' stroke-width='2'/%3E%3C/svg%3E"); }
+  .controls select { width: 100%; min-height: 30px; font: inherit; font-size: 13px; padding: 4px 26px 4px 10px; border: 1px solid var(--ink); background: #fff var(--chev) no-repeat right 11px center / 12px 8px; border-radius: 8px; appearance: none; -webkit-appearance: none; }
+  .controls select:disabled { color: var(--ink3); border-color: var(--line2); background-image: var(--chev-off); }
+  .controls select:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .empty-state { margin: 12px 12px 0; padding: 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; color: var(--ink2); }
+  .warn { margin: 12px 12px 0; padding: 10px 14px; background: #FFF6E5; border: 1px solid #E8C877; border-radius: 8px; color: #5A4300; font-size: 13px; }
+  .warn[hidden], .empty-state[hidden] { display: none; }
+
+  .pl-note { font-size: 13px; color: var(--ink); margin: 0 12px 12px; padding: 8px 12px; border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 8px; background: var(--panel); }
+  .pl-note.kpi-intro { margin: 16px 12px 12px; }
+  .pl-note p { margin: 0 0 6px; }
+  .pl-note p:last-child { margin: 0; }
+  .period { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; margin: 0 0 8px; padding: 7px 14px; border: 1px solid var(--line2); border-radius: 999px; background: var(--panel); font-size: 14px; }
+  .period[hidden] { display: none; }
+  .period .mode { font-weight: 800; letter-spacing: .06em; text-transform: uppercase; font-size: 12px; background: var(--brand); color: #fff; padding: 3px 9px; border-radius: 999px; }
+  .period .vs { color: var(--ink3); }
+
+  .kpis { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; padding: 0 12px; }
+  .kpi { background: var(--brand); color: #fff; padding: 18px 12px 14px; min-height: 150px; border-top: 6px solid var(--accent); border-radius: 12px; text-align: center; }
+  .kpi .v { font-size: 30px; font-weight: 800; line-height: 1.1; margin: 0 0 4px; letter-spacing: -.01em; }
+  .kpi .k { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #C8C7C5; }
+  .kpi .row { margin-top: 14px; font-size: 13px; }
+  .kpi .py small { font-size: 12px; font-weight: 500; margin-right: 4px; color: #C8C7C5; }
+  .kpi .py span { font-weight: 700; }
+  .kpi .delta { display: block; margin-top: 2px; font-size: 20px; font-weight: 800; line-height: 1.2; }
+  .kpi .delta.word { font-size: 16px; }
+  .delta.pos { color: var(--good-dark); } .delta.neg { color: var(--bad-dark); }
+  .delta.na, .delta.neu { color: #C8C7C5; }
+
+  h2.sec { font-size: 26px; font-weight: 800; margin: 28px 12px 2px; scroll-margin-top: calc(var(--nav-h, 68px) + var(--filt-h, 100px) + 8px); }
+  .jump { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 18px 12px 0; }
+  .jump span { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .02em; color: var(--ink2); margin-right: 4px; }
+  .jump a { font-size: 12.5px; font-weight: 600; color: var(--ink); text-decoration: none; padding: 5px 13px; border: 1px solid var(--line2); border-radius: 999px; background: var(--panel); }
+  .jump a:hover { border-color: var(--ink); }
+  .jump a:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .h2sub { font-size: 12.5px; color: var(--ink2); margin: 0 12px 10px; }
+  .h2sub b { color: var(--ink); }
+  .panel { background: var(--panel); border: 1px solid var(--accent); border-radius: 12px; padding: 18px 14px 12px; min-width: 0; }
+  .panel h3 { font-size: 16px; margin: 0; font-weight: 700; }
+  .panel .sub { font-size: 12.5px; color: var(--ink2); margin: 2px 0 8px; }
+  body.is-updating .charts, body.is-updating .trend, body.is-updating .sums, body.is-updating .pl, body.is-updating .contrib, body.is-updating .mxwrap { opacity: .45; transition: opacity .15s; }
+  .charts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; padding: 0 12px; }
+
+  .rank-row { display: grid; grid-template-columns: 130px 1fr; align-items: center; gap: 10px; padding: 4px 0; font-size: 13px; }
+  .rank-row .nm { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ink); }
+  .rank-row .bar-cell { display: grid; grid-template-columns: 1fr 92px; align-items: center; gap: 8px; min-width: 0; }
+  .rank-row .track { position: relative; height: 18px; }
+  .rank-row .track.has-neg::before { content: ""; position: absolute; left: var(--zero); top: -3px; bottom: -3px; width: 1px; background: var(--line2); }
+  .rank-row .bar { position: absolute; top: 0; height: 18px; background: var(--mark); border: 1px solid var(--brand); min-width: 2px; }
+  .rank-row .bar.neg { background: var(--bad); border-color: var(--bad); opacity: .6; }
+  .rank-row .val { font-size: 12.5px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); white-space: nowrap; }
+  .contrib { margin: 0; }
+  .contrib-head { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 8px 20px; margin-bottom: 8px; }
+  .contrib .rank-row .bar.pos { background: var(--good); border-color: var(--good); opacity: .55; }
+  .contrib .rank-row .bar.neg { background: var(--bad); border-color: var(--bad); opacity: .55; }
+  .contrib .rank-row.sep .bar { opacity: 1; }
+  .contrib .rank-row.sep { border-top: 1px solid var(--line2); margin-top: 6px; padding-top: 8px; font-weight: 700; }
+  .contrib .rank-row .bar-cell { grid-template-columns: 1fr 110px; }
+  .legend { display: flex; gap: 16px; font-size: 12px; color: var(--ink2); margin-bottom: 4px; }
+  .legend i { display: inline-block; width: 10px; height: 10px; margin-right: 5px; vertical-align: -1px; }
+  #trend { width: 100%; height: auto; display: block; }
+  #trend .bar { cursor: default; }
+  #trend .bar:hover { opacity: .8; }
+  .trend-sum { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--ink2); }
+  .trend-sum p { margin: 0 0 4px; }
+  .trend-sum b { color: var(--ink); }
+  .recon { margin: 8px 0 4px; font-size: 12.5px; color: var(--ink2); }
+  .chart-box { position: relative; }
+  #scatter { width: 100%; height: auto; display: block; }
+  #scatter .dot { cursor: default; }
+  #scatter .dot:hover { opacity: .8; }
+  .chart-tip { position: absolute; pointer-events: none; background: var(--ink); color: #fff; padding: 8px 12px; font-size: 12.5px; line-height: 1.4; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,.18); z-index: 2; }
+  .chart-tip[hidden] { display: none; }
+  .chart-tip .t { font-weight: 700; }
+  .empty-chart { color: var(--ink3); font-size: 13px; padding: 24px 0; }
+
+  .sums { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 0 12px; }
+  .tbl-wrap { overflow-x: auto; }
+  .tbl { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+  .tbl th { background: var(--head); color: #fff; font-size: 12px; font-weight: 700; text-align: right; padding: 9px 10px; white-space: nowrap; }
+  .tbl th:first-child, .tbl td:first-child { text-align: left; }
+  .tbl th:first-child { border-top-left-radius: 8px; } .tbl th:last-child { border-top-right-radius: 8px; }
+  .tbl th button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+  .tbl th button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  .tbl th[aria-sort="ascending"] button::after { content: " \25B4"; }
+  .tbl th[aria-sort="descending"] button::after { content: " \25BE"; }
+  .tbl td { text-align: right; padding: 7px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  .tbl tbody tr:nth-child(even) td { background: var(--band); }
+  .tbl tr.total td { font-weight: 700; background: #ECEBE6; border-bottom: 1px solid var(--line2); }
+  .tbl tbody tr.total td { background: #ECEBE6; border-top: 1px solid var(--line2); }
+  .tbl .pos { color: var(--good); } .tbl .neg { color: var(--bad); } .tbl .na { color: var(--ink3); }
+  .pl-block { padding: 0 12px; }
+
+  .panel .controls.one { grid-template-columns: minmax(0, 210px); flex: none; margin-left: auto; text-align: right; }
+  .contrib-head > div:first-child { flex: 1 1 260px; min-width: 0; }
+  #bridge, #optrend { width: 100%; height: auto; display: block; }
+  #bridge .bar:hover, #optrend .bar:hover, #optrend .dot:hover { opacity: .8; }
+  .mxwrap { padding: 0 12px; }
+  .mx { border-collapse: separate; border-spacing: 2px; font-size: 12.5px; font-variant-numeric: tabular-nums; width: 100%; }
+  .mx th { font-size: 12px; font-weight: 700; color: var(--ink2); text-align: center; padding: 4px 4px 6px; white-space: nowrap; }
+  .mx th:first-child, .mx td:first-child { text-align: left; padding-right: 14px; white-space: nowrap; }
+  .mx td { padding: 0; text-align: center; }
+  .mx td.ytd, .mx th.ytd { border-left: 1px solid var(--line2); padding-left: 4px; }
+  .mx td.nm { font-size: 13px; }
+  .mx tr.total td.nm, .mx tr.total button.c { font-weight: 700; }
+  .mx tr.total td { border-bottom: 1px solid var(--line2); padding-bottom: 4px; }
+  .mx button.c { display: block; width: 100%; min-width: 58px; font: inherit; font-size: 12.5px; padding: 8px 4px; color: var(--ink); background: transparent; border: 1px solid transparent; border-radius: 4px; cursor: pointer; }
+  .mx button.c:hover { border-color: var(--ink); }
+  .mx button.c:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
+  .mx button.c.sel { outline: 2px solid var(--ink); outline-offset: -2px; }
+  .mx button.c.nr { color: var(--ink3); }
+  .mx-notes { margin: 10px 0 0; font-size: 12.5px; color: var(--ink2); }
+  .mx-notes p { margin: 0 0 4px; }
+  .mx-detail { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .mx-detail h4 { margin: 0 0 8px; font-size: 14px; }
+  .mx-detail .hint { margin: 0; font-size: 12.5px; color: var(--ink3); }
+  .mx-detail .tbl-wrap { max-width: 640px; }
+  .controls.filters { position: sticky; top: var(--nav-h, 68px); z-index: 190; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin: 16px 0 0; padding: 40px 12px 16px; border-bottom: 1px solid var(--line); background: var(--panel); }
+  .fhint { margin: 10px 12px 0; font-size: 12.5px; color: var(--ink2); }
+  .sync-mini { position: absolute; left: 12px; top: 10px; line-height: 1.2; display: none; align-items: center; gap: 7px; max-width: calc(100% - 24px); font-size: 12px; font-weight: 600; color: var(--ink2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  body.sync-hidden .sync-mini { display: flex; }
+  .sync-mini .dot { width: 8px; height: 8px; border-radius: 50%; background: #A6A6A0; flex: none; }
+  .sync-mini.loading .dot, .sync-mini.updating .dot, .sync-mini.signin .dot, .sync-mini.cached .dot { background: #FF6B5F; animation: pulse .8s ease-in-out infinite; }
+  .sync-mini.ready .dot { background: #4ADE80; }
+  .sync-mini.error { color: var(--bad); }
+  .sync-mini.error .dot { background: var(--bad); }
+  .combo { position: relative; }
+  .combo-btn { width: 100%; min-height: 30px; font: inherit; font-size: 13px; color: var(--ink); text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 4px 26px 4px 10px; border: 1px solid var(--ink); background: #fff var(--chev) no-repeat right 11px center / 12px 8px; border-radius: 8px; cursor: pointer; }
+  .combo-btn:disabled { color: var(--ink3); border-color: var(--line2); background-image: var(--chev-off); cursor: default; }
+  .combo-btn:focus-visible, .combo-search:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .combo-panel { position: absolute; z-index: 150; left: 0; right: 0; top: 100%; margin-top: 2px; background: #fff; border: 1px solid var(--ink); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.18); }
+  .combo-panel[hidden] { display: none; }
+  .combo-search { display: block; width: 100%; padding: 6px 10px; font: inherit; font-size: 13px; background: #fff; border: 0; border-bottom: 1px solid var(--line2); border-radius: 0; }
+  .combo-list { list-style: none; margin: 0; padding: 0; max-height: 260px; overflow-y: auto; }
+  .combo-list li { padding: 5px 10px; font-size: 13px; cursor: pointer; }
+  .combo-list li.active { background: #E7E8E6; }
+  .combo-list li[aria-selected="true"] { font-weight: 700; }
+  .combo-list li.none { color: var(--ink3); cursor: default; }
+  .combo-list li::before { content: ""; display: inline-block; box-sizing: border-box; width: 17px; height: 17px; margin-right: 8px; vertical-align: -3px; border: 1.5px solid var(--ink); background: #fff no-repeat center / 13px 13px; }
+  .combo-list li[aria-selected="true"]::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6.5l3 3 5-7' fill='none' stroke='%23111111' stroke-width='1.2'/%3E%3C/svg%3E"); }
+  .combo-list li.none::before { display: none; }
+  .rank-row.hl { background: color-mix(in srgb, var(--accent) 22%, transparent); border-radius: 4px; }
+  .rank-row.hl .nm { font-weight: 700; }
+  .tbl tbody tr.hl td { background: color-mix(in srgb, var(--accent) 22%, #fff); font-weight: 600; }
+  .mx tr.hl td.nm { background: color-mix(in srgb, var(--accent) 22%, #fff); font-weight: 700; border-radius: 4px; }
+
+  .status { font-size: 12px; color: var(--ink3); margin: 14px 12px 0; }
+  .status.err { color: var(--bad); font-weight: 600; }
+  .source { margin: 16px 0 0; }
+  /* Kept laid out off-screen (not display:none) so the embed still loads; revealed when sign-in is needed or with ?source in the address. */
+  .source.is-hidden { position: absolute; left: -10000px; top: 0; width: 1100px; height: 480px; overflow: hidden; margin: 0; }
+  .source h2 { font-size: 18px; font-weight: 800; margin: 0 12px 2px; }
+  .source tableau-viz { display: block; }
+  .source .note { font-size: 12.5px; color: var(--ink2); margin: 0 12px 8px; }
+
+  @media (max-width: 1280px) { .kpis { grid-template-columns: repeat(4, 1fr); } .sums { grid-template-columns: 1fr; } }
+  @media (max-width: 900px) {
+    .controls, .controls.filters { grid-template-columns: 1fr 1fr; }
+    .kpis { grid-template-columns: 1fr 1fr; }
+    .charts { grid-template-columns: 1fr; }
+    h2.sec { font-size: 22px; }
+  }
+</style>
+</head>
+<body class="is-loading">
+<nav class="pnav" aria-label="Portal">
+  <a class="pnav__brand" href="index.html"><span class="pnav__mark">W+K</span><span>Finance Portal</span></a>
+  <div class="pnav__links">
+    <a href="index.html">Home</a>
+    <a href="global-client-portfolio.html">Global Client Portfolio</a>
+    <a href="office-profitability.html">Office Profitability</a>
+    <details class="pnav__menu">
+      <summary aria-current="page">Client Profitability</summary>
+      <div class="pnav__drop"><a href="anheuser-busch-inbev.html">Anheuser-Busch InBev</a><a href="eli-lilly.html">Eli Lilly</a><a href="ford.html">Ford</a><a href="kraft-heinz.html">Kraft Heinz</a><a href="mcdonalds.html">McDonald's</a><a href="nike.html" aria-current="page">Nike</a></div>
+    </details>
+  </div>
+</nav>
+<div class="shell">
+  <div class="brand-label">Client Profitability</div>
+  <h1 id="client-title">Nike</h1>
+  <div class="sync loading" id="sync" role="status" aria-live="polite"><span class="dot"></span><span id="sync-text">Loading data…</span></div>
+  <div class="signin" id="signin" hidden>
+    <span>Tableau needs you to sign in before the report can load. The sign-in box is just below.</span>
+    <button type="button" id="signin-btn">Sign in below ↓</button>
+  </div>
+</div>
+<main>
+  <section class="source is-hidden" id="source" aria-hidden="true">
+    <h2 id="source-title">Sign in to Tableau</h2>
+    <p class="note" id="source-note">Use the box below to sign in and load the report. This box disappears once the data loads.</p>
+    <tableau-viz id="viz"
+      src="https://prod-useast-a.online.tableau.com/t/wk/views/ProfitabilityPortalData/SRC_CPD_ClientParentOfficeMonth"
+      width="100%" height="420" toolbar="hidden" hide-tabs iframe-attr-loading="eager">
+    </tableau-viz>
+  </section>
+
+  <section class="controls filters" aria-label="Filters">
+    <div class="sync-mini loading" id="sync-mini" aria-hidden="true"><span class="dot"></span><span id="sync-mini-text">Loading data…</span></div>
+    <div><label for="f-year">Year</label><select id="f-year" disabled><option>—</option></select></div>
+    <div><label for="f-month">Through month</label><select id="f-month" disabled><option>—</option></select></div>
+    <div><label for="f-office">Office</label><select id="f-office" disabled><option>(All)</option></select></div>
+  </section>
+  <p class="fhint" id="filter-hint"></p>
+
+  <p class="empty-state" id="empty-state" hidden>No data for this client.</p>
+  <p class="warn" id="data-warn" hidden>Some data is missing in the source: a measure for some months, or the whole client total for a month. Figures that depend on it are shown as unavailable (—).</p>
+  <div class="pl-note kpi-intro">
+    <div class="period" id="period-pill" hidden></div>
+    <p>Data through <b class="cutoff">the latest available month</b>. The source does not say whether the latest month is closed, so it may still be adjusted. <span id="scope-sentence">Figures cover the client's full account across all offices.</span></p>
+    <p>Gross Profit is the reported Direct Contribution, which equals Revenue minus Direct Costs (Direct Labour and Direct Overheads) up to small recorded differences. Operating Profit is Gross Profit minus Indirect Costs. Costs are not colored green or red, because a higher or lower cost is not good or bad by itself.</p>
+  </div>
+
+  <section class="kpis">
+    <div class="kpi" id="k-rev"><div class="v">—</div><div class="k">Revenue</div><div class="row"><span class="py"><small></small><span></span></span><span class="delta"></span></div></div>
+    <div class="kpi" id="k-dcost"><div class="v">—</div><div class="k">Direct Costs</div><div class="row"><span class="py"><small></small><span></span></span><span class="delta"></span></div></div>
+    <div class="kpi" id="k-gp"><div class="v">—</div><div class="k">Gross Profit</div><div class="row"><span class="py"><small></small><span></span></span><span class="delta"></span></div></div>
+    <div class="kpi" id="k-gm"><div class="v">—</div><div class="k">Gross Margin</div><div class="row"><span class="py"><small></small><span></span></span><span class="delta"></span></div></div>
+    <div class="kpi" id="k-ind"><div class="v">—</div><div class="k">Indirect Costs</div><div class="row"><span class="py"><small></small><span></span></span><span class="delta"></span></div></div>
+    <div class="kpi" id="k-op"><div class="v">—</div><div class="k">Operating Profit</div><div class="row"><span class="py"><small></small><span></span></span><span class="delta"></span></div></div>
+    <div class="kpi" id="k-om"><div class="v">—</div><div class="k">Operating Margin</div><div class="row"><span class="py"><small></small><span></span></span><span class="delta"></span></div></div>
+  </section>
+
+  <nav class="jump" aria-label="On this page">
+    <span>On this page</span>
+    <a href="#overview">Performance Overview</a><a href="#drivers">Profit Drivers</a><a href="#by-month">Office by Month</a><a href="#pl-summary">P&amp;L Summary</a><a href="#profitability">Profitability by Office</a>
+  </nav>
+
+  <h2 class="sec" id="overview">Performance Overview</h2>
+  <p class="h2sub">Monthly <b>Revenue</b> against the prior year, offices plotted by the selected metrics, offices ranked by the <b>primary metric</b>, and the <b>change in Revenue by office</b>. Data through <b class="cutoff">the latest available month</b>, in USD. Offices with no activity in the period are not shown.</p>
+  <section class="controls">
+    <div><label for="f-primary">Primary metric</label>
+      <select id="f-primary" disabled>
+        <option value="rev" selected>Revenue</option><option value="gp">Gross Profit</option><option value="op">Operating Profit</option>
+      </select></div>
+    <div><label for="f-secondary">Secondary metric</label>
+      <select id="f-secondary" disabled>
+        <option value="gm" selected>Gross Margin</option><option value="om">Operating Margin</option>
+      </select></div>
+    <p class="hint">Revenue and Gross Profit by office add up to the client total, within small differences. Operating Profit and Operating Margin do not, because Indirect Costs are allocated to offices.</p>
+  </section>
+  <section class="charts trend">
+    <article class="panel">
+      <div class="contrib-head">
+        <div>
+          <h3 id="trend-title">Revenue by Month</h3>
+          <p class="sub" id="trend-sub"></p>
+        </div>
+      </div>
+      <div class="legend"><span><i id="lg-py" style="background:#B7B7B2"></i><span id="lg-py-t">Prior year</span></span><span><i id="lg-cy"></i><span id="lg-cy-t">Current year</span></span><span><i style="background:#B2182B"></i>Negative month</span></div>
+      <div class="chart-box">
+        <svg id="trend" viewBox="0 0 640 300" role="img" aria-label="Revenue by month, current year against prior year"></svg>
+        <div class="chart-tip" id="trend-tip" hidden></div>
+      </div>
+      <div class="trend-sum" id="trend-sum"></div>
+    </article>
+    <article class="panel">
+      <h3 id="scatter-title">Primary vs. Secondary Metric</h3>
+      <p class="sub">Each dot is an office. Offices without revenue have no margin and are not plotted.</p>
+      <div class="chart-box">
+        <svg id="scatter" viewBox="0 0 600 360" role="img" aria-label="Offices plotted by primary and secondary metric"></svg>
+        <div class="chart-tip" id="scatter-tip" hidden></div>
+      </div>
+    </article>
+    <article class="panel">
+      <h3 id="rank-title">Office Ranking</h3>
+      <p class="sub">Each office ranked by the selected primary metric.</p>
+      <div id="ranking"></div>
+    </article>
+    <article class="panel contrib">
+      <div class="contrib-head">
+        <div>
+          <h3 id="contrib-title">Office Contribution to Change in Revenue</h3>
+          <p class="sub" id="contrib-sub"></p>
+        </div>
+      </div>
+      <div id="contrib"></div>
+      <p class="recon" id="contrib-recon"></p>
+    </article>
+  </section>
+
+  <h2 class="sec" id="drivers">Profit Drivers</h2>
+  <p class="h2sub">Why profit moved against the prior year, and how Operating Profit built up through the year. Follows the Office filter at the top (client total by default), in USD.</p>
+  <section class="charts drivers">
+    <article class="panel">
+      <div class="contrib-head">
+        <div>
+          <h3 id="bridge-title">Profit Bridge</h3>
+          <p class="sub" id="bridge-sub"></p>
+        </div>
+      </div>
+      <div class="chart-box">
+        <svg id="bridge" viewBox="0 0 640 310" role="img" aria-label="Profit bridge from the prior year to the current year"></svg>
+        <div class="chart-tip" id="bridge-tip" hidden></div>
+      </div>
+      <p class="recon" id="bridge-recon"></p>
+    </article>
+    <article class="panel">
+      <div class="contrib-head">
+        <div>
+          <h3 id="op-title">Operating Profit by Month</h3>
+          <p class="sub" id="op-sub"></p>
+        </div>
+        <div class="controls one"><div><label for="f-opmode">View</label>
+          <select id="f-opmode" disabled><option value="month" selected>Monthly</option><option value="cum">Cumulative</option></select></div></div>
+      </div>
+      <div class="legend"><span><i id="lg2-py" style="background:#B7B7B2"></i><span id="lg2-py-t">Prior year</span></span><span><i id="lg2-cy"></i><span id="lg2-cy-t">Current year</span></span><span id="lg2-neg"><i style="background:#B2182B"></i>Negative month</span></div>
+      <div class="chart-box">
+        <svg id="optrend" viewBox="0 0 640 300" role="img" aria-label="Operating Profit by month, current year against prior year"></svg>
+        <div class="chart-tip" id="op-tip" hidden></div>
+      </div>
+      <div class="trend-sum" id="opsum"></div>
+    </article>
+  </section>
+
+  <h2 class="sec" id="by-month">Office by Month</h2>
+  <p class="h2sub">Each office month by month, to spot recurring losses and months where several offices fall together. Select a cell to see its five measures against the same month of the prior year. In USD.</p>
+  <section class="mxwrap">
+    <div class="panel">
+      <div class="contrib-head">
+        <div>
+          <h3 id="mx-title">Revenue by Office and Month</h3>
+        </div>
+        <div class="controls one"><div><label for="f-matrix">Measure</label>
+          <select id="f-matrix" disabled><option value="rev" selected>Revenue</option><option value="gp">Gross Profit</option><option value="op">Operating Profit (allocated)</option></select></div></div>
+      </div>
+      <div class="tbl-wrap"><table class="mx" id="mx"></table></div>
+      <div class="mx-notes" id="mx-notes"></div>
+      <div class="mx-detail" id="mx-detail"></div>
+    </div>
+  </section>
+
+  <h2 class="sec" id="pl-summary">P&amp;L Summary by Office</h2>
+  <p class="h2sub">Current year against the <b>same months of the prior year</b>, in USD. Each table lists the offices that have a non-zero value for its metric in either period. An office with no record in the current period shows <b>No record</b>: it counts as zero in the Revenue and Gross Profit tables (the offices still add up to the client total), and its Operating Profit change is not calculated (nor for an office with no record in the prior-year period). Data through <b class="cutoff">the latest available month</b>.</p>
+  <section class="sums" id="sums"></section>
+
+  <h2 class="sec" id="profitability">Profitability by Office</h2>
+  <p class="h2sub">Profit and loss of each office, in USD, year to date.</p>
+  <p class="pl-note">Client-level totals are in the first row and in the cards above. Office-level Operating Profit and Indirect Costs are allocations and are not meant to sum to the client total.</p>
+  <div class="pl-block">
+    <div class="panel">
+      <div class="tbl-wrap">
+        <table class="tbl pl" id="pl">
+          <thead><tr><th data-k="label"><button type="button">Office</button></th><th data-k="rev"><button type="button">Revenue</button></th><th data-k="dl"><button type="button">Direct Labour</button></th><th data-k="dov"><button type="button">Direct Overheads</button></th><th data-k="gp"><button type="button">Gross Profit</button></th><th data-k="ind"><button type="button">Indirect Costs</button></th><th data-k="op"><button type="button">Operating Profit</button></th><th data-k="gm"><button type="button">Gross Margin</button></th><th data-k="om"><button type="button">Operating Margin</button></th><th data-k="staff" title="Direct Labour divided by Revenue, as recorded"><button type="button">Staff Ratio</button></th></tr></thead>
+          <tbody id="pl-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="pl-note" id="pl-notes" style="margin-top:12px"></div>
+
+  <p class="status err" id="status" hidden></p>
+
+</main>
+
+<script type="module">
+  const CLIENT = window.CLIENT;
+  // The client menu in the nav closes when the viewer clicks elsewhere or presses Escape.
+  (() => {
+    const m = document.querySelector(".pnav__menu");
+    if (!m) return;
+    document.addEventListener("click", e => { if (m.open && !m.contains(e.target)) m.open = false; });
+    document.addEventListener("keydown", e => { if (e.key === "Escape" && m.open) { m.open = false; m.querySelector("summary").focus(); } });
+  })();
+  // The sticky filter bar sits just below the sticky nav (whose height changes at the mobile breakpoint); anchors clear both.
+  (() => {
+    const nav = document.querySelector(".pnav"), bar = document.querySelector(".filters");
+    const set = () => { const r = document.documentElement.style; if (nav) r.setProperty("--nav-h", nav.offsetHeight + "px"); if (bar) r.setProperty("--filt-h", bar.offsetHeight + "px"); };
+    set(); const ro = new ResizeObserver(set); if (nav) ro.observe(nav); if (bar) ro.observe(bar);
+  })();
+  const ROOT = "WKI";   // the client total comes from the WKI row; office rows are the parent offices
+  document.getElementById("client-title").textContent = CLIENT.name;
+  const viz = document.getElementById("viz");
+  const statusEl = document.getElementById("status");
+  const primarySel = document.getElementById("f-primary");
+  const secondarySel = document.getElementById("f-secondary");
+  const yearSel = document.getElementById("f-year");
+  const monthSel = document.getElementById("f-month");
+  const officeSel = document.getElementById("f-office");
+  const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const MONTH_WORDS = {
+    january:1, jan:1, enero:1, ene:1, february:2, feb:2, febrero:2, march:3, mar:3, marzo:3,
+    april:4, apr:4, abril:4, abr:4, may:5, mayo:5, june:6, jun:6, junio:6, july:7, jul:7, julio:7,
+    august:8, aug:8, agosto:8, ago:8, september:9, sep:9, sept:9, septiembre:9, setiembre:9,
+    october:10, oct:10, octubre:10, november:11, nov:11, noviembre:11, december:12, dec:12, diciembre:12, dic:12
+  };
+  const MEASURES = ["rev", "dl", "dov", "dc", "ind"];
+  const NEAR = 1;   // amounts under $1 count as zero
+
+  // One fact per year x month x office (this client only). The WKI row is the client total.
+  // `n` is how many of the five measures the source returned for that row (5 = complete).
+  let facts = [];
+  let reading = false, rerun = false, timer = null;
+  // Filters at the top of the page. selYear and selMonth are null until the viewer chooses: the latest year and month then apply.
+  // selOffices holds the picked parent offices; empty means all offices (the client total, from the WKI rows).
+  let selYear = null, selMonth = null;
+  const selOffices = new Set();
+  const focused = () => selOffices.size > 0;
+  const isSel = o => selOffices.has(o);
+  const inScope = o => focused() ? selOffices.has(o) : o === ROOT;
+  const scopeName = () => selOffices.size === 1 ? [...selOffices][0] : selOffices.size + " offices";
+  const scopeList = () => [...selOffices].sort((a, b) => a.localeCompare(b)).join(", ");
+
+  const syncEl = document.getElementById("sync");
+  const syncText = document.getElementById("sync-text");
+  const syncMini = document.getElementById("sync-mini");
+  const syncMiniText = document.getElementById("sync-mini-text");
+  // The compact status in the sticky bar shows only once the header status has scrolled out of view.
+  new IntersectionObserver(([e]) => document.body.classList.toggle("sync-hidden", !e.isIntersecting)).observe(syncEl);
+  let loaded = false;
+  let lastSync = "";
+
+  function setState(state, text, detail) {
+    syncEl.className = "sync " + state;
+    syncText.textContent = text;
+    syncMini.className = "sync-mini " + state;
+    syncMiniText.textContent = text;
+    syncEl.title = detail || "";
+    if (state === "ready" || state === "error" || state === "cached") document.body.classList.remove("is-loading");
+    document.body.classList.toggle("is-updating", state === "updating");
+    statusEl.hidden = state !== "error";
+    statusEl.textContent = state === "error" ? detail || text : "";
+  }
+  function busyState() {
+    if (fromCache) return ["cached", "Showing saved data from " + lastSync + " · Updating…"];
+    return loaded ? ["updating", "Updating…"] : ["loading", "Loading data…"];
+  }
+  // Full retrieval stamp with the day, so a saved snapshot from a previous day is recognisable.
+  // The last known failure (sign-in needed, refresh failed, embed failed). It is shown again whenever the saved snapshot
+  // finishes loading, and a later successful read clears it.
+  let failure = null;
+  function showFailure() {
+    if (!failure) return;
+    const keeping = fromCache && loaded;
+    const text = keeping ? withSaved(failure.text) : failure.fallback;
+    setState(failure.state, text, failure.state === "error" ? (keeping ? text + " " : "") + failure.detail : "");
+  }
+  // Appended to any failure or sign-in message while saved figures are on screen.
+  const withSaved = text => text + ". Showing saved data from " + lastSync + ".";
+  function stamp(d) { return d.toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }); }
+
+  // ---------- local cache (IndexedDB): paint the last read instantly, refresh from Tableau in the background ----------
+  const CACHE_KEY = "client-profitability-" + CLIENT.key.toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-facts-v3";
+  let fromCache = false;
+  function idb() {
+    return new Promise((res, rej) => {
+      const r = indexedDB.open("wk-finance-portal", 1);
+      r.onupgradeneeded = () => r.result.createObjectStore("cache");
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+    });
+  }
+  async function cacheGet() {
+    try {
+      const db = await idb();
+      return await new Promise((res, rej) => {
+        const q = db.transaction("cache").objectStore("cache").get(CACHE_KEY);
+        q.onsuccess = () => res(q.result || null);
+        q.onerror = () => rej(q.error);
+      });
+    } catch (_) { return null; }
+  }
+  async function cachePut(v) {
+    try {
+      const db = await idb();
+      await new Promise((res, rej) => {
+        const t = db.transaction("cache", "readwrite");
+        t.objectStore("cache").put(v, CACHE_KEY);
+        t.oncomplete = res;
+        t.onerror = () => rej(t.error);
+      });
+    } catch (_) {}
+  }
+  function errText(e) { return e && e.message ? e.message : String(e); }
+  function sheet() {
+    const s = viz.workbook.activeSheet;
+    return s.sheetType === "worksheet" ? s : (s.worksheets && s.worksheets[0]) || null;
+  }
+
+  // ---------- data shape ----------
+  function toNum(v) {
+    if (typeof v === "number") return v;
+    if (typeof v === "string" && v.trim() !== "" && !isNaN(Number(v))) return Number(v);
+    return null;
+  }
+  function monthOf(cell) {
+    const n = toNum(cell.value);
+    if (n !== null && Number.isInteger(n) && n >= 1 && n <= 12) return n;
+    for (const s of [cell.value, cell.formattedValue]) {
+      if (typeof s === "string") {
+        const m = MONTH_WORDS[s.trim().toLowerCase().replace(/\./g, "")];
+        if (m) return m;
+      }
+    }
+    return null;
+  }
+  // SRC_CPD_ClientParentOfficeMonth carries each measure as _USD; the page is USD-only.
+  function kindOf(name) {
+    const s = String(name || "").trim().toLowerCase();
+    return { revenue_usd: "rev", directlabour_usd: "dl", directoverheads_usd: "dov",
+             directcontribution_usd: "dc", indirectcosts_usd: "ind" }[s] || null;
+  }
+
+  function parse(table) {
+    const cols = table.columns, rows = table.data;
+    if (!rows.length) return [];
+    const names = cols.map(c => c.fieldName.trim());
+    const find = re => names.findIndex(n => re.test(n));
+    const mn = find(/^(measure names|nombres de medidas)$/i);
+    const mv = find(/^(measure values|valores de medidas)$/i);
+    const ci = find(/^reportingclient/i);
+    const pi = find(/^parent\s*office/i);
+    let yi = -1, mi = -1;
+    cols.forEach((c, i) => {
+      if (yi >= 0 || i === mn || i === mv) return;
+      if (rows.every(r => { const n = toNum(r[i].value); return n !== null && n >= 1900 && n <= 2100; })) yi = i;
+    });
+    cols.forEach((c, i) => {
+      if (mi >= 0 || i === mn || i === mv || i === yi) return;
+      if (rows.every(r => monthOf(r[i]) !== null)) mi = i;
+    });
+    if (mn < 0 || mv < 0 || yi < 0 || mi < 0 || ci < 0 || pi < 0) throw new Error("Unexpected data shape. Columns: " + names.join(" · "));
+
+    const map = new Map();
+    for (const r of rows) {
+      if (r[ci].formattedValue !== CLIENT.key) continue;
+      const k = kindOf(r[mn].value) || kindOf(r[mn].formattedValue);
+      const v = toNum(r[mv].value);
+      if (!k) continue;
+      const y = toNum(r[yi].value), m = monthOf(r[mi]), office = r[pi].formattedValue;
+      const key = [y, m, office].join("|");
+      if (!map.has(key)) map.set(key, { y, m, office, rev: 0, dl: 0, dov: 0, dc: 0, ind: 0, seen: new Set() });
+      const f = map.get(key);
+      // A measure counts as present only when the source returned a number for it; a null stays "missing", not zero.
+      if (v === null) continue;
+      f[k] += v; f.seen.add(k);
+    }
+    return [...map.values()].map(f => { f.miss = MEASURES.filter(k => !f.seen.has(k)); delete f.seen; return f; });
+  }
+
+  // ---------- reading ----------
+  function refresh() { clearTimeout(timer); timer = setTimeout(readNow, 120); }
+
+  async function readNow() {
+    if (reading) { rerun = true; return; }
+    reading = true;
+    setState(...busyState());
+    let reader;
+    try {
+      const t0 = performance.now();
+      reader = await sheet().getSummaryDataReaderAsync();
+      const table = await reader.getAllPagesAsync();
+      const ms = Math.round(performance.now() - t0);
+      facts = parse(table);
+      enableSelectors();
+      render();
+      loaded = true;
+      const now = new Date();
+      lastSync = stamp(now);
+      fromCache = false; failure = null;
+      cachePut({ facts, time: lastSync, ts: now.getTime() });
+      setState("ready", "Ready · Read from Tableau on " + lastSync,
+        table.data.length + " rows read in " + ms + " ms. Retrieval time is not the accounting period or the time the source was last updated.");
+    } catch (e) {
+      failure = { state: "error", text: "Could not refresh from Tableau", fallback: "Error", detail: "Could not read data from Tableau: " + errText(e) };
+      await cacheReady;
+      showFailure();
+    } finally {
+      if (reader) { try { await reader.releaseAsync(); } catch (_) {} }
+      reading = false;
+      if (rerun) { rerun = false; refresh(); }
+    }
+  }
+
+  const opModeSel = document.getElementById("f-opmode");
+  const mxSel = document.getElementById("f-matrix");
+  function enableSelectors() { for (const s of [primarySel, secondarySel, opModeSel, mxSel, yearSel, monthSel, officeSel]) s.disabled = false; }
+  for (const s of [primarySel, secondarySel, opModeSel, mxSel]) s.addEventListener("change", render);
+  yearSel.addEventListener("change", () => { selYear = Number(yearSel.value); selMonth = null; render(); });
+  monthSel.addEventListener("change", () => { selMonth = Number(monthSel.value); render(); });
+  const officeCombo = makeCombo(officeSel, selOffices, () => render());
+  // Multi-select: a button and a checkbox list with search over the hidden <select> (kept for its label and disabled state).
+  // `picked` is the Set that holds the choice (empty = All). Choosing applies at once: the data is already on the page.
+  function makeCombo(sel, picked, onChange) {
+    let opts = [];
+    const label = document.querySelector('label[for="' + sel.id + '"]');
+    const wrap = document.createElement("div"); wrap.className = "combo";
+    sel.parentNode.insertBefore(wrap, sel);
+    const btn = document.createElement("button");
+    btn.type = "button"; btn.className = "combo-btn"; btn.id = sel.id + "-combo";
+    btn.setAttribute("aria-haspopup", "listbox"); btn.setAttribute("aria-expanded", "false");
+    if (label) label.htmlFor = btn.id;
+    const panel = document.createElement("div"); panel.className = "combo-panel"; panel.hidden = true;
+    const search = document.createElement("input");
+    search.type = "search"; search.className = "combo-search"; search.placeholder = "Search…";
+    search.setAttribute("aria-label", "Search " + (label ? label.textContent : "options"));
+    const list = document.createElement("ul"); list.className = "combo-list"; list.setAttribute("role", "listbox"); list.setAttribute("aria-multiselectable", "true");
+    panel.append(search, list);
+    wrap.append(btn, panel, sel);
+    sel.hidden = true;
+    let items = [], active = -1;
+    const sync = () => {
+      const n = picked.size;
+      btn.textContent = n === 0 ? "(All)" : n === 1 ? [...picked][0] : n + " selected";
+      btn.disabled = sel.disabled;
+    };
+    const close = focusBtn => { panel.hidden = true; btn.setAttribute("aria-expanded", "false"); if (focusBtn) btn.focus(); };
+    const setActive = i => { active = i; items.forEach((li, k) => li.classList.toggle("active", k === i)); if (items[i]) items[i].scrollIntoView({ block: "nearest" }); };
+    const ALL = "__all__";
+    const toggle = v => {
+      if (v === ALL) picked.clear(); else if (picked.has(v)) picked.delete(v); else picked.add(v);
+      sync(); onChange();
+      const keep = active, top = list.scrollTop;
+      renderList();
+      list.scrollTop = top;
+      if (keep >= 0) setActive(Math.min(keep, items.length - 1));
+    };
+    const renderList = () => {
+      const q = search.value.trim().toLowerCase();
+      list.replaceChildren(); items = [];
+      const add = (value, text) => {
+        const li = document.createElement("li");
+        li.setAttribute("role", "option"); li.textContent = text; li.dataset.value = value;
+        li.setAttribute("aria-selected", String(value === ALL ? picked.size === 0 : picked.has(value)));
+        li.addEventListener("mousedown", e => { e.preventDefault(); toggle(value); });
+        list.appendChild(li); items.push(li);
+      };
+      if (!q) add(ALL, "(All)");
+      opts.forEach(o => { if (!q || o.toLowerCase().includes(q)) add(o, o); });
+      if (!items.length) { const li = document.createElement("li"); li.className = "none"; li.textContent = "No matches"; list.appendChild(li); }
+      setActive(items.length && q ? 0 : -1);
+    };
+    const open = () => { if (btn.disabled) return; panel.hidden = false; btn.setAttribute("aria-expanded", "true"); search.value = ""; renderList(); search.focus(); };
+    btn.addEventListener("click", () => panel.hidden ? open() : close(false));
+    search.addEventListener("input", renderList);
+    search.addEventListener("keydown", e => {
+      if (e.key === "ArrowDown") { e.preventDefault(); if (items.length) setActive((active + 1) % items.length); }
+      else if (e.key === "ArrowUp") { e.preventDefault(); if (items.length) setActive((active - 1 + items.length) % items.length); }
+      else if (e.key === "Enter") { e.preventDefault(); if (items[active]) toggle(items[active].dataset.value); }
+      else if (e.key === "Escape") { e.preventDefault(); close(true); }
+      else if (e.key === "Tab") close(false);
+    });
+    // Capture phase: checked before an option click re-renders the list and detaches the clicked <li>.
+    document.addEventListener("mousedown", e => { if (!wrap.contains(e.target)) close(false); }, true);
+    new MutationObserver(sync).observe(sel, { attributes: true, attributeFilter: ["disabled"] });
+    sync();
+    return {
+      // Offer these options; picks that are no longer offered are dropped.
+      setOptions(list2) { opts = list2; [...picked].forEach(v => { if (!list2.includes(v)) picked.delete(v); }); sync(); }
+    };
+  }
+  function fillFilters(years, cyYear, cutoffMax, cutoff) {
+    const fill = (sel, opts, value) => {
+      sel.replaceChildren(...opts.map(([v, t]) => { const o = document.createElement("option"); o.value = v; o.textContent = t; return o; }));
+      sel.value = value;
+    };
+    fill(yearSel, years.map(y => [y, String(y)]), cyYear);
+    fill(monthSel, Array.from({ length: cutoffMax }, (_, i) => [i + 1, MONTHS[i] + (i + 1 === cutoffMax ? " (latest)" : "")]), cutoff);
+    const offices = [...new Set(facts.filter(f => f.office !== ROOT && (f.y === cyYear || f.y === cyYear - 1)).map(f => f.office))].sort((a, b) => a.localeCompare(b));
+    officeCombo.setOptions(offices);
+  }
+
+  // ---------- formatting ----------
+  function fmtMoney(v) {
+    if (v === null || !isFinite(v)) return "—";
+    const a = Math.abs(v), sign = v < 0 ? "-" : "";
+    if (a >= 1e9) return sign + "$" + (a / 1e9).toFixed(1) + "B";
+    if (a >= 1e6) return sign + "$" + (a / 1e6).toFixed(1) + "M";
+    if (a >= 1e3) return sign + "$" + (a / 1e3).toFixed(1) + "K";
+    return sign + "$" + a.toFixed(0);
+  }
+  function fmtUsd(v) {
+    if (v === null || !isFinite(v)) return "—";
+    return (v < 0 ? "-$" : "$") + Math.round(Math.abs(v)).toLocaleString("en-US");
+  }
+  function fmtUsdSigned(v) {
+    if (v === null || !isFinite(v)) return "—";
+    if (Math.abs(v) < 0.5) return "$0";
+    return (v < 0 ? "-$" : "+$") + Math.round(Math.abs(v)).toLocaleString("en-US");
+  }
+  function fmtPct(v) { return v === null || !isFinite(v) ? "—" : (v * 100).toFixed(1) + "%"; }
+  function signed(v, digits, suffix) { return (v >= 0 ? "+" : "") + v.toFixed(digits) + suffix; }
+
+  // How a value changed against the prior year. A percentage is used only when both values are non-negative and the
+  // base is not zero; when a sign changes or a loss shrinks or grows, the change is described in words, because a
+  // percentage of a negative base is easy to misread. kind: "op" (loss/profit words), "rev" or "gp" (negative/positive
+  // words), "cost" (same words, shown neutral). Returns { pct } or { word, tone } with tone pos | neg | neu | na.
+  function change(kind, cy, py) {
+    if (cy === null || py === null || !isFinite(cy) || !isFinite(py)) return { word: "n/a", tone: "na" };
+    const z = v => Math.abs(v) < NEAR;
+    const loss = kind === "op";
+    const tone = t => kind === "cost" ? "neu" : t;
+    if (z(py)) return { word: "—", tone: "na" };
+    if (py > 0) {
+      if (cy <= -NEAR) return { word: loss ? "Profit to loss" : "Positive to negative", tone: tone("neg") };
+      return { pct: (cy - py) / py };
+    }
+    // prior value negative
+    if (cy >= NEAR) return { word: loss ? "Loss to profit" : "Negative to positive", tone: tone("pos") };
+    if (z(cy)) return { word: loss ? "Loss to zero" : "Negative to zero", tone: tone("pos") };
+    const d = cy - py;
+    if (d > 0) return { word: loss ? "Loss narrowed" : "Negative, narrower", tone: tone("pos") };
+    if (d < 0) return { word: loss ? "Loss widened" : "Negative, wider", tone: tone("neg") };
+    return { word: "No change", tone: "na" };
+  }
+
+  // ---------- sums and metrics ----------
+  // YTD sums for one office (or the WKI row), up to the cutoff month. Null when the office has no rows;
+  // `miss` is the set of measures that are missing in any contributing row.
+  function sums(office, year, cutoff) {
+    const s = { rev: 0, dl: 0, dov: 0, dc: 0, ind: 0, miss: new Set(), gaps: [] };
+    let any = false;
+    for (const f of facts) {
+      if (f.office !== office || f.y !== year || f.m > cutoff) continue;
+      for (const k of MEASURES) s[k] += f[k];
+      for (const k of f.miss) s.miss.add(k);
+      any = true;
+    }
+    if (!any) return null;
+    // The client total (WKI) has a row for every month of the year, so a month without any WKI row inside the period
+    // is a gap in the source, not a zero: every metric of that period is unavailable. (Offices are different: an
+    // absent office-month counts as zero, which the monthly reconciliation to WKI supports for Revenue and Gross Profit.)
+    if (office === ROOT) {
+      for (let m = 1; m <= cutoff; m++) if (!facts.some(f => f.office === ROOT && f.y === year && f.m === m)) s.gaps.push(m);
+      if (s.gaps.length) for (const k of MEASURES) s.miss.add(k);
+    }
+    return s;
+  }
+  // Metrics follow the client dashboard: Direct Costs = Direct Labour + Direct Overheads, Gross Profit = the
+  // Direct Contribution column, Operating Profit = Gross Profit - Indirect Costs. Ratios are null when |Revenue| < 1.
+  // When a measure is missing from the source, only the metrics that use it are unavailable (null); they are never
+  // treated as zero. Revenue, Direct Labour, Direct Overheads, Gross Profit and Indirect Costs each need themselves;
+  // Direct Costs need the two direct costs; Operating Profit needs Gross Profit and Indirect Costs; each ratio also needs Revenue.
+  function derive(s) {
+    if (!s) return null;
+    const has = (...ks) => ks.every(k => !s.miss.has(k));
+    const ok = has("rev") && Math.abs(s.rev) >= 1;
+    const op = has("dc", "ind") ? s.dc - s.ind : null;
+    return { miss: s.miss, gaps: s.gaps, rev: has("rev") ? s.rev : null, dl: has("dl") ? s.dl : null, dov: has("dov") ? s.dov : null,
+      dcost: has("dl", "dov") ? s.dl + s.dov : null, gp: has("dc") ? s.dc : null, ind: has("ind") ? s.ind : null, op,
+      gm: ok && has("dc") ? s.dc / s.rev : null, om: ok && op !== null ? op / s.rev : null, staff: ok && has("dl") ? s.dl / s.rev : null };
+  }
+  const activeD = d => !!d && (d.miss.size > 0 || ["rev", "dl", "dov", "gp", "ind"].some(k => d[k] !== null && Math.abs(d[k]) >= 0.5));
+
+  const PRIMARY = { rev: { label: "Revenue" }, gp: { label: "Gross Profit" }, op: { label: "Operating Profit" } };
+  const SECONDARY = { gm: { label: "Gross Margin" }, om: { label: "Operating Margin" } };
+
+  // ---------- KPI cards ----------
+  function setKpi(id, value, pyYear, pyValue, tone, deltaText, word) {
+    const el = document.getElementById(id);
+    el.querySelector(".v").textContent = value;
+    el.querySelector(".py small").textContent = pyYear;
+    el.querySelector(".py span").textContent = pyValue;
+    const d = el.querySelector(".delta");
+    d.textContent = deltaText;
+    d.className = "delta " + tone + (word ? " word" : "");
+  }
+  const KPI_IDS = ["k-rev", "k-dcost", "k-gp", "k-gm", "k-ind", "k-op", "k-om"];
+
+  // The last render's inputs, kept so the contribution chart can redraw when its metric changes.
+  let view = null;
+
+  function render() {
+    const root = facts.filter(f => f.office === ROOT);
+    document.getElementById("empty-state").hidden = root.length > 0;
+    document.getElementById("data-warn").hidden = true;
+    if (!root.length) {
+      KPI_IDS.forEach(id => setKpi(id, "—", "", "", "na", "n/a"));
+      document.getElementById("period-pill").hidden = true;
+      for (const id of ["ranking", "scatter", "sums", "pl-body", "contrib", "trend", "trend-sum", "bridge", "optrend", "opsum", "mx", "mx-notes", "mx-detail"]) document.getElementById(id).replaceChildren();
+      document.getElementById("contrib-recon").textContent = "";
+      document.getElementById("bridge-recon").textContent = "";
+      document.getElementById("pl-notes").hidden = true;
+      view = null;
+      return;
+    }
+    // Cutoff = the latest month in which the client total (WKI) has any non-zero measure, shared by all offices.
+    // Not read as proof that the month is closed; the source carries no period-close indicator.
+    const live = root.filter(f => MEASURES.some(k => Math.abs(f[k]) >= 0.5));
+    const base = live.length ? live : root;
+    const liveYears = [...new Set(base.map(f => f.y))].sort((a, b) => b - a);
+    if (selYear === null) selYear = liveYears[0];
+    else if (!liveYears.includes(selYear)) { selYear = liveYears[0]; selMonth = null; }
+    const cyYear = selYear;
+    const cutoffMax = Math.max(...base.filter(f => f.y === cyYear).map(f => f.m));
+    if (selMonth !== null && selMonth >= cutoffMax) selMonth = null;
+    const cutoff = selMonth === null ? cutoffMax : selMonth;
+    const pyYear = cyYear - 1;
+    fillFilters(liveYears, cyYear, cutoffMax, cutoff);
+    const range = y => (cutoff === 1 ? MONTHS[0].slice(0, 3) : MONTHS[0].slice(0, 3) + "–" + MONTHS[cutoff - 1].slice(0, 3)) + " " + y;
+    const cy = derive(sums(ROOT, cyYear, cutoff)), py = derive(sums(ROOT, pyYear, cutoff));
+    // The cards follow the Office filter; every other client-level figure below keeps using the client total (cy, py).
+    const kcy = derive(scopeSums(cyYear, cutoff)), kpy = derive(scopeSums(pyYear, cutoff));
+
+    document.getElementById("data-warn").hidden = !(facts.some(f => f.miss.length) || (cy && cy.gaps.length) || (py && py.gaps.length));
+    const pill = document.getElementById("period-pill");
+    pill.innerHTML = '<span class="mode">' + (cutoff < 12 ? "YTD" : "Full year") + '</span><b>' + range(cyYear) + '</b>'
+      + (py ? '<span class="vs">vs</span><b>' + range(pyYear) + '</b>' : "") + '<span class="vs">· USD</span>';
+    if (focused()) { const sp = document.createElement("span"); sp.className = "vs"; sp.textContent = "·"; const b = document.createElement("b"); b.textContent = scopeName(); b.title = scopeList(); pill.append(sp, b); }
+    pill.hidden = false;
+
+    const pyL = kpy ? "vs. " + pyYear + ":" : "";
+    // [card id, metric key, money or ratio, change kind]; "colored" cards use green/red, cost cards stay neutral
+    const CARDS = [["k-rev", "rev", "$", "rev"], ["k-dcost", "dcost", "$", "cost"], ["k-gp", "gp", "$", "gp"], ["k-gm", "gm", "%", "gm"],
+                   ["k-ind", "ind", "$", "cost"], ["k-op", "op", "$", "op"], ["k-om", "om", "%", "om"]];
+    for (const [id, k, unit, kind] of CARDS) {
+      const cv = kcy ? kcy[k] : null, pv = kpy ? kpy[k] : null;
+      let tone = "na", text = "n/a", word = false;
+      if (cv !== null && pv !== null) {
+        if (unit === "%") { const d = (cv - pv) * 100; text = signed(d, 1, " pts"); tone = d >= 0 ? "pos" : "neg"; }
+        else {
+          const c = change(kind, cv, pv);
+          if (c.pct !== undefined) { text = signed(c.pct * 100, 1, "%"); tone = kind === "cost" ? "neu" : c.pct >= 0 ? "pos" : "neg"; }
+          else { text = c.word; tone = c.tone; word = true; }
+        }
+      }
+      setKpi(id, unit === "$" ? fmtMoney(cv) : fmtPct(cv), pyL, pv === null ? "" : unit === "$" ? fmtMoney(pv) : fmtPct(pv), tone, text, word);
+    }
+
+    const cutoffLabel = MONTHS[cutoff - 1] + " " + cyYear;
+    document.querySelectorAll(".cutoff").forEach(n => { n.textContent = cutoffLabel; });
+    const officeOn = focused(), who = scopeName();
+    document.getElementById("scope-sentence").textContent = officeOn
+      ? "The cards show " + who + " only; Indirect Costs, Operating Profit and Operating Margin of an office are allocations and do not add up to the client total."
+      : "Figures cover the client's full account across all offices.";
+    document.getElementById("filter-hint").textContent = (officeOn
+      ? "The cards, the revenue trend, the profit bridge and Operating Profit by Month show " + who + (selOffices.size > 1 ? " (" + scopeList() + ", added together)" : "") + ". The ranking, scatter, contribution, matrix and tables keep every office for comparison, with the selection highlighted."
+      : "Pick one or more offices to focus the cards and charts on them; the comparison views keep every office.")
+      + (py ? "" : " The source has no " + pyYear + " data, so comparisons show n/a.");
+
+    // Offices: every parent office with activity in either period (for the change views); the current-period
+    // subset feeds the rankings and tables. The WKI row is the client total, not an office.
+    const all = [...new Set(facts.map(f => f.office).filter(o => o && o !== ROOT))]
+      .map(o => ({ office: o, cy: derive(sums(o, cyYear, cutoff)), py: derive(sums(o, pyYear, cutoff)) }))
+      .filter(x => activeD(x.cy) || activeD(x.py));
+    const cur = all.filter(x => activeD(x.cy));
+    view = { all, cur, cy, py, cyYear, pyYear, cutoff, range: range(cyYear) + " against " + range(pyYear) };
+    drawRanking(cur, cyYear);
+    drawScatter(cur, cyYear);
+    drawContribution();
+    drawTrend();
+    drawBridge();
+    drawOpTrend();
+    drawMatrix();
+    drawMxDetail();
+    drawSummaries();
+    plArgs = { offices: cur, total: cy };
+    drawProfitability();
+    drawProfitNotes(cur);
+  }
+
+  // ---------- ranking ----------
+  function drawRanking(offices, year) {
+    const pk = primarySel.value;
+    document.getElementById("rank-title").textContent = "Office " + PRIMARY[pk].label + " Ranking (" + year + ")";
+    const rows = offices.map(x => ({ office: x.office, v: x.cy[pk] })).filter(x => x.v !== null && isFinite(x.v)).sort((a, b) => b.v - a.v);
+    const host = document.getElementById("ranking");
+    if (!rows.length) { host.innerHTML = '<p class="empty-chart">No offices to rank.</p>'; return; }
+    const maxPos = Math.max(0, ...rows.map(x => x.v));
+    const maxNeg = Math.max(0, ...rows.map(x => -x.v));
+    const rng = (maxPos + maxNeg) || 1;
+    const zero = maxNeg / rng * 100;
+    const frag = document.createDocumentFragment();
+    rows.forEach(x => {
+      const row = document.createElement("div"); row.className = "rank-row" + (isSel(x.office) ? " hl" : "");
+      const nm = document.createElement("span"); nm.className = "nm"; nm.textContent = x.office; nm.title = x.office;
+      const cell = document.createElement("span"); cell.className = "bar-cell";
+      const track = document.createElement("span"); track.className = "track" + (maxNeg > 0 ? " has-neg" : "");
+      track.style.setProperty("--zero", zero.toFixed(2) + "%");
+      const bar = document.createElement("span"); bar.className = "bar" + (x.v < 0 ? " neg" : "");
+      const w = Math.abs(x.v) / rng * 100;
+      bar.style.width = w.toFixed(2) + "%";
+      bar.style.left = (x.v < 0 ? zero - w : zero).toFixed(2) + "%";
+      if (Math.abs(x.v) < 0.5) bar.style.display = "none";   // a zero keeps its row and label but draws no bar
+      track.appendChild(bar);
+      const val = document.createElement("span"); val.className = "val"; val.textContent = fmtUsd(x.v);
+      cell.append(track, val); row.append(nm, cell); frag.appendChild(row);
+    });
+    host.replaceChildren(frag);
+  }
+
+  // ---------- scatter: primary metric (x) against secondary metric (y) ----------
+  const NS = "http://www.w3.org/2000/svg";
+  function el(tag, attrs, text) {
+    const n = document.createElementNS(NS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (text !== undefined) n.textContent = text;
+    return n;
+  }
+  function niceStep(span) {
+    const raw = span / 4, p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p;
+    return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * p;
+  }
+  // Axis ticks around [min, max], always including zero. unit = 100 for ratios so that steps land on whole percents.
+  function ticks(min, max, unit) {
+    let lo = Math.min(0, min) * unit, hi = Math.max(0, max) * unit;
+    if (hi - lo <= 0) hi = lo + 1;
+    const step = niceStep(hi - lo);
+    const out = [];
+    for (let t = Math.floor(lo / step) * step; t <= Math.ceil(hi / step) * step + step * 1e-9; t += step) out.push(t / unit);
+    return out;
+  }
+  const tip = document.getElementById("scatter-tip");
+  function moveTip(e) {
+    const box = tip.parentElement.getBoundingClientRect();
+    let x = e.clientX - box.left + 14;
+    if (x + tip.offsetWidth > box.width - 8) x = e.clientX - box.left - tip.offsetWidth - 14;
+    tip.style.left = x + "px"; tip.style.top = Math.max(0, e.clientY - box.top - 12 - tip.offsetHeight) + "px";
+  }
+
+  function drawScatter(offices, year) {
+    const pk = primarySel.value, sk = secondarySel.value;
+    document.getElementById("scatter-title").textContent = PRIMARY[pk].label + " vs. " + SECONDARY[sk].label + " (" + year + ")";
+    const svg = document.getElementById("scatter");
+    svg.replaceChildren(); tip.hidden = true;
+    const pts = offices.map(x => ({ office: x.office, x: x.cy[pk], y: x.cy[sk] })).filter(p => p.x !== null && p.y !== null && isFinite(p.x) && isFinite(p.y));
+    if (!pts.length) { svg.appendChild(el("text", { x: 300, y: 180, "text-anchor": "middle", "font-size": 13, fill: "#7B7B74" }, "No offices to plot.")); return; }
+    const W = 600, H = 360, L = 64, R = 24, T = 14, B = 46;
+    const pw = W - L - R, ph = H - T - B;
+    const xt = ticks(Math.min(...pts.map(p => p.x)), Math.max(...pts.map(p => p.x)), 1);
+    const yt = ticks(Math.min(...pts.map(p => p.y)), Math.max(...pts.map(p => p.y)), 100);
+    const x0 = xt[0], x1 = xt[xt.length - 1], y0 = yt[0], y1 = yt[yt.length - 1];
+    const X = v => L + (v - x0) / (x1 - x0 || 1) * pw;
+    const Y = v => T + ph - (v - y0) / (y1 - y0 || 1) * ph;
+    // Negative zones: a light red tint left of zero (x) and below zero (y); where both overlap it is slightly stronger.
+    const NEG = "#B2182B";
+    if (x0 < 0) svg.appendChild(el("rect", { x: X(x0), y: T, width: X(0) - X(x0), height: ph, fill: NEG, "fill-opacity": 0.07 }));
+    if (y0 < 0) svg.appendChild(el("rect", { x: L, y: Y(0), width: pw, height: Y(y0) - Y(0), fill: NEG, "fill-opacity": 0.07 }));
+    yt.forEach(t => {
+      svg.appendChild(el("line", { x1: L, x2: W - R, y1: Y(t), y2: Y(t), stroke: t === 0 ? "#C9C9C3" : "#E6E6E2", "stroke-width": 1 }));
+      svg.appendChild(el("text", { x: L - 8, y: Y(t) + 4, "text-anchor": "end", "font-size": 11.5, fill: t < 0 ? NEG : "#7B7B74" }, fmtPct(t).replace(".0%", "%")));
+    });
+    xt.forEach(t => {
+      svg.appendChild(el("line", { x1: X(t), x2: X(t), y1: T, y2: T + ph, stroke: t === 0 ? "#C9C9C3" : "#E6E6E2", "stroke-width": 1 }));
+      svg.appendChild(el("text", { x: X(t), y: T + ph + 16, "text-anchor": "middle", "font-size": 11.5, fill: t < 0 ? NEG : "#7B7B74" }, fmtMoney(t)));
+    });
+    svg.appendChild(el("text", { x: L + pw / 2, y: H - 6, "text-anchor": "middle", "font-size": 12, "font-weight": 600, fill: "#4F4F4A" }, PRIMARY[pk].label));
+    svg.appendChild(el("text", { x: 14, y: T + ph / 2, "text-anchor": "middle", "font-size": 12, "font-weight": 600, fill: "#4F4F4A", transform: "rotate(-90 14 " + (T + ph / 2) + ")" }, SECONDARY[sk].label));
+    pts.forEach(p => {
+      const cx = X(p.x), cyy = Y(p.y);
+      const hit = isSel(p.office), dim = focused() && !hit;
+      const c = el("circle", { cx, cy: cyy, r: hit ? 8.5 : 6.5, fill: CLIENT.dot || CLIENT.accent, "fill-opacity": dim ? 0.45 : 1, stroke: hit ? "#111111" : CLIENT.brand, "stroke-width": hit ? 2.4 : 1.2, class: "dot" });
+      c.addEventListener("mouseenter", () => {
+        tip.replaceChildren();
+        const t = document.createElement("div"); t.className = "t"; t.textContent = p.office;
+        const a = document.createElement("div"); a.textContent = PRIMARY[pk].label + " " + fmtUsd(p.x);
+        const b = document.createElement("div"); b.textContent = SECONDARY[sk].label + " " + fmtPct(p.y);
+        tip.append(t, a, b); tip.hidden = false;
+      });
+      c.addEventListener("mousemove", moveTip);
+      c.addEventListener("mouseleave", () => { tip.hidden = true; });
+      svg.appendChild(c);
+      const right = cx > L + pw * 0.78;
+      svg.appendChild(el("text", { x: right ? cx - 10 : cx + 10, y: cyy + 4, "text-anchor": right ? "end" : "start", "font-size": 12, "font-weight": isSel(p.office) ? 700 : 400, fill: p.x < 0 || p.y < 0 ? NEG : "#111111" }, p.office));
+    });
+  }
+
+  // ---------- Office Contribution to Change: dollar change per office, reconciled to the client total ----------
+  const CONTRIB_LABEL = { rev: "Revenue", gp: "Gross Profit" };
+  function drawContribution() {
+    if (!view) return;
+    const k = "rev";
+    const { all, cy, py, range } = view;
+    document.getElementById("contrib-title").textContent = "Office Contribution to Change in " + CONTRIB_LABEL[k];
+    document.getElementById("contrib-sub").textContent = "Dollar change in " + CONTRIB_LABEL[k] + ", " + range + ", for every office with activity in either period. An office with no record in a period counts as zero.";
+    const host = document.getElementById("contrib"), recon = document.getElementById("contrib-recon");
+    const incomplete = all.some(x => (x.cy && x.cy.rev === null) || (x.py && x.py.rev === null)) || !cy || !py || cy.rev === null || py.rev === null;
+    if (incomplete) {
+      host.innerHTML = '<p class="empty-chart">Not available: Revenue is missing for one of the periods.</p>'; recon.textContent = ""; return;
+    }
+    const rows = all.map(x => ({ office: x.office, cv: x.cy ? x.cy[k] : 0, pv: x.py ? x.py[k] : 0 }))
+      .filter(x => Math.abs(x.cv) >= 0.5 || Math.abs(x.pv) >= 0.5)
+      .map(x => ({ ...x, d: x.cv - x.pv })).sort((a, b) => b.d - a.d || a.office.localeCompare(b.office));
+    const totalD = cy[k] - py[k];
+    const sumD = rows.reduce((s, x) => s + x.d, 0);
+    const maxPos = Math.max(0, totalD, ...rows.map(x => x.d)), maxNeg = Math.max(0, -totalD, ...rows.map(x => -x.d));
+    const rng = (maxPos + maxNeg) || 1, zero = maxNeg / rng * 100;
+    const frag = document.createDocumentFragment();
+    const addRow = (label, d, cls, extraClass, title) => {
+      const row = document.createElement("div"); row.className = "rank-row" + (extraClass ? " " + extraClass : "");
+      const nm = document.createElement("span"); nm.className = "nm"; nm.textContent = label; nm.title = title || label;
+      const cell = document.createElement("span"); cell.className = "bar-cell";
+      const track = document.createElement("span"); track.className = "track" + (maxNeg > 0 ? " has-neg" : "");
+      track.style.setProperty("--zero", zero.toFixed(2) + "%");
+      const bar = document.createElement("span"); bar.className = "bar " + cls;
+      const w = Math.abs(d) / rng * 100;
+      bar.style.width = w.toFixed(2) + "%"; bar.style.left = (d < 0 ? zero - w : zero).toFixed(2) + "%";
+      if (Math.abs(d) < 0.5) bar.style.display = "none";
+      track.appendChild(bar);
+      const val = document.createElement("span"); val.className = "val"; val.textContent = fmtUsdSigned(d);
+      cell.append(track, val); row.append(nm, cell); frag.appendChild(row);
+    };
+    rows.forEach(x => addRow(x.office, x.d, x.d < 0 ? "neg" : "pos", isSel(x.office) ? "hl" : "", x.office + ": " + fmtUsd(x.cv) + " now, " + fmtUsd(x.pv) + " before"));
+    addRow("Client total", totalD, totalD < 0 ? "neg" : "pos", "sep", "Client total (WKI): " + fmtUsd(cy[k]) + " now, " + fmtUsd(py[k]) + " before");
+    host.replaceChildren(frag);
+    const gap = sumD - totalD;
+    recon.textContent = Math.abs(gap) < 1
+      ? "The offices add up to the client total change of " + fmtUsdSigned(totalD) + "."
+      : "The offices add up to " + fmtUsdSigned(sumD) + "; the client total change is " + fmtUsdSigned(totalD) + ". The difference of " + fmtUsd(Math.abs(gap)) + " is not explained by the offices shown.";
+  }
+
+  // ---------- Revenue by Month: current year against prior year, for the client total ----------
+  const trendTip = document.getElementById("trend-tip");
+  function moveTipFor(tipEl) {
+    return e => {
+      const box = tipEl.parentElement.getBoundingClientRect();
+      let x = e.clientX - box.left + 14;
+      if (x + tipEl.offsetWidth > box.width - 8) x = e.clientX - box.left - tipEl.offsetWidth - 14;
+      tipEl.style.left = x + "px"; tipEl.style.top = Math.max(0, e.clientY - box.top - 12 - tipEl.offsetHeight) + "px";
+    };
+  }
+  const moveTrendTip = moveTipFor(trendTip);
+  // Revenue of the chosen scope in one month: { v, bad }. v is null when there is no record; bad is true (and v null)
+  // when the row exists but its Revenue value is missing, which is not the same as a month with no record.
+  function scopeRev(year, m) {
+    let v = null, bad = false;
+    for (const f of facts) {
+      if (!inScope(f.office) || f.y !== year || f.m !== m) continue;
+      if (f.miss.includes("rev")) bad = true; else v = (v || 0) + f.rev;
+    }
+    return { v: bad ? null : v, bad };
+  }
+  // Revenue over a month range; unavailable (bad) as soon as one month of the range is missing its Revenue value.
+  function scopeRevRange(year, lo, hi) {
+    let any = false, t = 0, bad = false;
+    for (let m = lo; m <= hi; m++) {
+      const r = scopeRev(year, m);
+      if (r.bad || (r.v === null && !focused())) bad = true;   // a client-total month with no row is a gap
+      else if (r.v !== null) { any = true; t += r.v; }
+    }
+    return { v: bad ? null : any ? t : null, bad };
+  }
+  function changeText(cv, pv, kind) {
+    const c = change(kind || "rev", cv, pv), d = fmtUsdSigned(cv - pv);
+    return c.pct !== undefined ? d + ", " + signed(c.pct * 100, 1, "%") : d + ", " + c.word.toLowerCase();
+  }
+
+  function drawTrend() {
+    if (!view) return;
+    const { cyYear, pyYear, cutoff } = view;
+    const svg = document.getElementById("trend");
+    svg.replaceChildren(); trendTip.hidden = true;
+    document.getElementById("trend-title").textContent = "Revenue by Month" + (focused() ? ", " + scopeName() : "");
+    document.getElementById("trend-sub").textContent = cyYear + " runs through " + MONTHS[cutoff - 1] + "; " + pyYear + " shows all months. A month with no record has no bar.";
+    document.getElementById("lg-cy").style.background = CLIENT.brand;
+    document.getElementById("lg-py-t").textContent = pyYear;
+    document.getElementById("lg-cy-t").textContent = cyYear;
+
+    const W = 640, H = 300, L = 58, R = 6, T = 12, B = 28;
+    const pw = W - L - R, ph = H - T - B, gw = pw / 12;
+    const cyV = [], pyV = [];
+    let anyBad = false;
+    for (let m = 1; m <= 12; m++) {
+      const p = scopeRev(pyYear, m), c = m <= cutoff ? scopeRev(cyYear, m) : { v: null, bad: false };
+      pyV[m] = p.v; cyV[m] = c.v;
+      if (p.bad || c.bad || (!focused() && (p.v === null || (m <= cutoff && c.v === null)))) anyBad = true;
+    }
+    if (anyBad) document.getElementById("trend-sub").textContent += " Months where the source has no Revenue value are not drawn.";
+    const vals = [...pyV, ...cyV].filter(v => v !== null && v !== undefined);
+    if (!vals.length) { svg.appendChild(el("text", { x: W / 2, y: H / 2, "text-anchor": "middle", "font-size": 13, fill: "#7B7B74" }, "No Revenue records for this scope.")); }
+    else {
+      const NEG = "#B2182B";
+      const t = ticks(Math.min(...vals), Math.max(...vals), 1);
+      const lo = t[0], hi = t[t.length - 1];
+      const Y = v => T + ph - (v - lo) / (hi - lo || 1) * ph;
+      t.forEach(v => {
+        svg.appendChild(el("line", { x1: L, x2: W - R, y1: Y(v), y2: Y(v), stroke: v === 0 ? "#7B7B74" : "#E6E6E2", "stroke-width": v === 0 ? 1.2 : 1 }));
+        svg.appendChild(el("text", { x: L - 8, y: Y(v) + 4, "text-anchor": "end", "font-size": 11.5, fill: v < 0 ? NEG : "#7B7B74" }, fmtMoney(v)));
+      });
+      for (let m = 1; m <= 12; m++) {
+        const gx = L + (m - 1) * gw, bw = gw * 0.32;
+        svg.appendChild(el("text", { x: gx + gw / 2, y: T + ph + 18, "text-anchor": "middle", "font-size": 11.5, "font-weight": 600, fill: "#111111" }, MONTHS[m - 1].slice(0, 3)));
+        [[pyYear, pyV[m], gx + gw * 0.14, "#B7B7B2", null], [cyYear, cyV[m], gx + gw * 0.54, CLIENT.brand, pyV[m]]].forEach(([yr, v, x, color, cmp]) => {
+          if (v === null || v === undefined) return;
+          const neg = v < -0.5;
+          const y0 = Y(0), y1 = Y(v);
+          const r = el("rect", { x, y: Math.min(y0, y1), width: bw, height: Math.max(1, Math.abs(y1 - y0)), fill: neg ? NEG : color, "fill-opacity": neg && yr === pyYear ? 0.5 : 1, class: "bar" });
+          r.addEventListener("mouseenter", () => {
+            trendTip.replaceChildren();
+            const a = document.createElement("div"); a.style.fontWeight = "700"; a.textContent = MONTHS[m - 1] + " " + yr;
+            const b = document.createElement("div"); b.textContent = "Revenue " + fmtUsd(v);
+            trendTip.append(a, b);
+            if (cmp !== null && cmp !== undefined) { const c = document.createElement("div"); c.textContent = "vs " + pyYear + " (" + fmtUsd(cmp) + "): " + changeText(v, cmp); trendTip.appendChild(c); }
+            trendTip.hidden = false;
+          });
+          r.addEventListener("mousemove", moveTrendTip);
+          r.addEventListener("mouseleave", () => { trendTip.hidden = true; });
+          svg.appendChild(r);
+        });
+      }
+    }
+
+    // Latest month and last three months against the same months of the prior year (Revenue only).
+    const lo3 = Math.max(1, cutoff - 2);
+    const lines = [
+      [MONTHS[cutoff - 1] + " " + cyYear, cutoff, cutoff, MONTHS[cutoff - 1] + " " + pyYear],
+      [(lo3 === cutoff ? MONTHS[cutoff - 1] : MONTHS[lo3 - 1].slice(0, 3) + "–" + MONTHS[cutoff - 1].slice(0, 3)) + " " + cyYear, lo3, cutoff,
+       (lo3 === cutoff ? MONTHS[cutoff - 1] : MONTHS[lo3 - 1].slice(0, 3) + "–" + MONTHS[cutoff - 1].slice(0, 3)) + " " + pyYear]
+    ];
+    const host = document.getElementById("trend-sum");
+    host.replaceChildren(...lines.map(([label, a, b, plabel]) => {
+      const cr = scopeRevRange(cyYear, a, b), pr = scopeRevRange(pyYear, a, b), cv = cr.v, pv = pr.v;
+      const p = document.createElement("p");
+      const strong = document.createElement("b"); strong.textContent = label + ": ";
+      let text;
+      if (cr.bad) text = "unavailable, the source has no Revenue value for at least one of these months.";
+      else if (cv === null) text = "no record.";
+      else if (pr.bad) text = fmtUsd(cv) + " (" + plabel + " is unavailable: the source has no Revenue value for at least one of its months).";
+      else if (pv === null) text = fmtUsd(cv) + " (no record in " + plabel + ").";
+      else text = fmtUsd(cv) + " against " + fmtUsd(pv) + " in " + plabel + " (" + changeText(cv, pv) + ").";
+      p.append(strong, text);
+      return p;
+    }));
+  }
+
+  // ---------- helpers for the Profit Drivers charts and the matrix ----------
+  const bridgeTip = document.getElementById("bridge-tip"), opTip = document.getElementById("op-tip");
+  function hoverTip(node, tipEl, lines) {
+    const move = moveTipFor(tipEl);
+    node.addEventListener("mouseenter", () => {
+      tipEl.replaceChildren(...lines.map((t, i) => { const d = document.createElement("div"); if (i === 0) d.style.fontWeight = "700"; d.textContent = t; return d; }));
+      tipEl.hidden = false;
+    });
+    node.addEventListener("mousemove", move);
+    node.addEventListener("mouseleave", () => { tipEl.hidden = true; });
+  }
+  const sgnMoney = v => (v >= 0 ? "+" : "") + fmtMoney(v);
+  // One office (or the WKI client total) in one month: the derived metrics, or null when the office has no row.
+  // A client-total month without a row is a gap in the source, so all its metrics are unavailable.
+  function monthD(office, year, m) {
+    const f = facts.find(x => x.office === office && x.y === year && x.m === m);
+    if (!f) return office === ROOT ? derive({ rev: 0, dl: 0, dov: 0, dc: 0, ind: 0, miss: new Set(MEASURES), gaps: [m] }) : null;
+    return derive({ rev: f.rev, dl: f.dl, dov: f.dov, dc: f.dc, ind: f.ind, miss: new Set(f.miss), gaps: [] });
+  }
+  // The scope of the cards and of the client-level charts: the client total (WKI) or the sum of the picked offices.
+  // An office with no row in a period adds nothing (it counts as zero); the scope is null when none of them has a row.
+  function scopeSums(year, cutoff) {
+    if (!focused()) return sums(ROOT, year, cutoff);
+    const s = { rev: 0, dl: 0, dov: 0, dc: 0, ind: 0, miss: new Set(), gaps: [] };
+    let any = false;
+    for (const o of selOffices) {
+      const x = sums(o, year, cutoff);
+      if (!x) continue;
+      any = true;
+      for (const k of MEASURES) s[k] += x[k];
+      x.miss.forEach(k => s.miss.add(k));
+    }
+    return any ? s : null;
+  }
+  function scopeMonthD(year, m) {
+    if (!focused()) return monthD(ROOT, year, m);
+    const s = { rev: 0, dl: 0, dov: 0, dc: 0, ind: 0, miss: new Set(), gaps: [] };
+    let any = false;
+    for (const f of facts) {
+      if (f.y !== year || f.m !== m || !selOffices.has(f.office)) continue;
+      any = true;
+      for (const k of MEASURES) s[k] += f[k];
+      f.miss.forEach(k => s.miss.add(k));
+    }
+    return any ? derive(s) : null;
+  }
+  function unavailable(svg, w, h, text) {
+    svg.appendChild(el("text", { x: w / 2, y: h / 2, "text-anchor": "middle", "font-size": 13, fill: "#7B7B74" }, text));
+  }
+
+  // ---------- Profit Bridge: change in profit against the prior year ----------
+  // One cascade of changes (current year minus prior year): the Revenue change, then the Direct Labour and Direct Overheads
+  // steps down to the Gross Profit change and, for the client total, the Indirect Costs step down to the Operating Profit
+  // change. An office stops at Gross Profit because its Operating Profit is an allocation. Each step is its effect on profit,
+  // so a cost that fell is a positive step. "Other" is the difference between the reported Gross Profit and Revenue less
+  // Direct Labour and Direct Overheads. An office with no record in a period counts as zero in that period.
+  function drawBridge() {
+    if (!view) return;
+    const { cy, py, cyYear, pyYear, cutoff, range } = view;
+    const client = !focused();
+    const cS = client ? null : derive(scopeSums(cyYear, cutoff)), pS = client ? null : derive(scopeSums(pyYear, cutoff));
+    const ZERO = { rev: 0, dl: 0, dov: 0, gp: 0, ind: 0, op: 0 };
+    const C = client ? cy : (cS || (pS ? ZERO : null)), P = client ? py : (pS || (cS ? ZERO : null));   // no record in a period counts as zero
+    const svg = document.getElementById("bridge"), recon = document.getElementById("bridge-recon");
+    svg.replaceChildren(); bridgeTip.hidden = true; recon.textContent = "";
+    document.getElementById("bridge-title").textContent = "Profit Bridge" + (client ? "" : ", " + scopeName());
+    document.getElementById("bridge-sub").textContent = "Change in Revenue, Gross Profit" + (client ? " and Operating Profit" : "") + ", " + range + ". Cost steps show their effect on profit: a cost that fell adds to it."
+      + (client ? "" : " The bridge stops at Gross Profit because office Operating Profit is an allocation.");
+    const need = client ? ["rev", "dl", "dov", "gp", "ind"] : ["rev", "dl", "dov", "gp"];
+    if (!C || !P || need.some(k => C[k] === null || P[k] === null)) {
+      unavailable(svg, 640, 310, !client && !cS && !pS ? "No record for the selection in either period." : "Not available: a measure or a period is missing.");
+      return;
+    }
+
+    const dRev = C.rev - P.rev, dGp = C.gp - P.gp, dOp = client ? C.op - P.op : null;
+    const pair = (k, lab) => lab + " " + fmtUsd(C[k]) + " in " + cyYear + ", " + fmtUsd(P[k]) + " in " + pyYear;
+    const other = dGp - (dRev - (C.dl - P.dl) - (C.dov - P.dov));
+    const showOther = Math.abs(other) >= 0.5;
+    // total bars start at zero; step bars float from the running level
+    const bars = [{ l: ["Revenue", "change"], total: true, v: dRev, det: pair("rev", "Revenue") }];
+    let run = dRev;
+    const step = (l, d, det, isOther) => { bars.push({ l, d, a: run, b: run + d, det, other: isOther }); run += d; };
+    step(["Direct", "Labour"], -(C.dl - P.dl), pair("dl", "Direct Labour"));
+    step(["Direct", "Overheads"], -(C.dov - P.dov), pair("dov", "Direct Overheads"));
+    if (showOther) step(["Other"], other, "Reported Gross Profit differs from Revenue less Direct Labour and Direct Overheads", true);
+    bars.push({ l: ["Gross Profit", "change"], total: true, v: dGp, det: pair("gp", "Gross Profit") });
+    if (client) {
+      run = dGp;
+      step(["Indirect", "Costs"], -(C.ind - P.ind), pair("ind", "Indirect Costs"));
+      bars.push({ l: ["Operating Profit", "change"], total: true, v: dOp, det: pair("op", "Operating Profit") });
+    }
+
+    const W = 640, H = 310, L = 58, R = 6, T = 22, B = 46, pw = W - L - R, ph = H - T - B, gw = pw / bars.length, bw = Math.min(gw * 0.68, 78);
+    const NEG = "#B2182B";
+    const ends = bars.flatMap(b => b.total ? [0, b.v] : [b.a, b.b]);
+    const t = ticks(Math.min(...ends), Math.max(...ends), 1);
+    const lo = t[0], hi = t[t.length - 1];
+    const Y = v => T + ph - (v - lo) / (hi - lo || 1) * ph;
+    t.forEach(v => {
+      svg.appendChild(el("line", { x1: L, x2: W - R, y1: Y(v), y2: Y(v), stroke: v === 0 ? "#7B7B74" : "#E6E6E2", "stroke-width": v === 0 ? 1.2 : 1 }));
+      svg.appendChild(el("text", { x: L - 8, y: Y(v) + 4, "text-anchor": "end", "font-size": 11.5, fill: v < 0 ? NEG : "#7B7B74" }, fmtMoney(v)));
+    });
+    bars.forEach((b, i) => {
+      const a = b.total ? 0 : b.a, e = b.total ? b.v : b.b, x = L + i * gw + (gw - bw) / 2;
+      if (i < bars.length - 1) svg.appendChild(el("line", { x1: x + bw, x2: L + (i + 1) * gw + (gw - bw) / 2, y1: Y(e), y2: Y(e), stroke: "#A6A6A0", "stroke-width": 1 }));
+      const fill = b.total ? CLIENT.brand : b.other ? "#7B7B74" : b.d >= 0 ? "#146B3A" : NEG;
+      const r = el("rect", { x, y: Math.min(Y(a), Y(e)), width: bw, height: Math.max(1, Math.abs(Y(a) - Y(e))), fill, "fill-opacity": b.total ? 1 : 0.8, class: "bar" });
+      hoverTip(r, bridgeTip, b.total ? [b.l.join(" "), fmtUsdSigned(b.v), b.det] : [b.l.join(" "), "Effect on profit " + fmtUsdSigned(b.d), b.det]);
+      svg.appendChild(r);
+      // the value goes above a bar that rises or sits on zero, and below a bar that ends under zero
+      const down = e < a || (b.total && b.v < 0);
+      svg.appendChild(el("text", { x: x + bw / 2, y: down ? Math.max(Y(a), Y(e)) + 14 : Math.min(Y(a), Y(e)) - 5, "text-anchor": "middle", "font-size": 11.5, "font-weight": 600, fill: "#111111" }, sgnMoney(b.total ? b.v : b.d)));
+      b.l.forEach((line, j) => svg.appendChild(el("text", { x: x + bw / 2, y: T + ph + 16 + j * 13, "text-anchor": "middle", "font-size": 11.5, "font-weight": 600, fill: "#111111" }, line)));
+    });
+    recon.textContent = "Revenue " + fmtUsdSigned(dRev) + ", Gross Profit " + fmtUsdSigned(dGp) + (client ? ", Operating Profit " + fmtUsdSigned(dOp) : "") + ". The steps add up to each change."
+      + (showOther ? " “Other” (" + fmtUsdSigned(other) + ") is the gap between the reported Gross Profit and Revenue less Direct Labour and Direct Overheads." : "")
+      + (!client && (!cS || !pS) ? " No record in " + (!cS ? cyYear : pyYear) + ": counted as zero." : "");
+  }
+
+  // ---------- Operating Profit by Month: monthly bars or cumulative lines, client total ----------
+  function drawOpTrend() {
+    if (!view) return;
+    const { cyYear, pyYear, cutoff } = view;
+    const cum = opModeSel.value === "cum";
+    const svg = document.getElementById("optrend");
+    svg.replaceChildren(); opTip.hidden = true;
+    const monthOp = (y, m) => { const d = scopeMonthD(y, m); return d ? d.op : null; };
+    const cyM = [], pyM = [];
+    for (let m = 1; m <= 12; m++) { pyM[m] = monthOp(pyYear, m); cyM[m] = m <= cutoff ? monthOp(cyYear, m) : null; }
+    // Running total; it stops at the first month without a value rather than carrying the last balance forward.
+    const running = a => { const out = []; let t = 0, ok = true; for (let m = 1; m <= 12; m++) { if (a[m] === null) ok = false; if (ok) t += a[m]; out[m] = ok ? t : null; } return out; };
+    const cyS = cum ? running(cyM) : cyM, pyS = cum ? running(pyM) : pyM;
+    const who = focused() ? ", " + scopeName() : "";
+    document.getElementById("op-title").textContent = (cum ? "Cumulative Operating Profit" : "Operating Profit by Month") + who;
+    document.getElementById("op-sub").textContent = cum
+      ? "Recorded Operating Profit adding up month by month, " + cyYear + " against " + pyYear + ". It is not cash flow or a forecast. A month without a value stops the line."
+      : cyYear + " runs through " + MONTHS[cutoff - 1] + "; " + pyYear + " shows all months. A month with no record has no bar.";
+    if (focused()) document.getElementById("op-sub").textContent += " Office Operating Profit is allocated and does not add up to the client total.";
+    document.getElementById("lg2-cy").style.background = CLIENT.brand;
+    document.getElementById("lg2-py-t").textContent = pyYear;
+    document.getElementById("lg2-cy-t").textContent = cyYear;
+    document.getElementById("lg2-neg").hidden = cum;
+
+    const W = 640, H = 300, L = 58, R = 6, T = 22, B = 28, pw = W - L - R, ph = H - T - B, gw = pw / 12;
+    const NEG = "#B2182B";
+    const vals = [...pyS, ...cyS].filter(v => v !== null && v !== undefined);
+    if (!vals.length) unavailable(svg, W, H, "No Operating Profit values.");
+    else {
+      const t = ticks(Math.min(...vals), Math.max(...vals), 1);
+      const lo = t[0], hi = t[t.length - 1];
+      const Y = v => T + ph - (v - lo) / (hi - lo || 1) * ph;
+      t.forEach(v => {
+        svg.appendChild(el("line", { x1: L, x2: W - R, y1: Y(v), y2: Y(v), stroke: v === 0 ? "#7B7B74" : "#E6E6E2", "stroke-width": v === 0 ? 1.2 : 1 }));
+        svg.appendChild(el("text", { x: L - 8, y: Y(v) + 4, "text-anchor": "end", "font-size": 11.5, fill: v < 0 ? NEG : "#7B7B74" }, fmtMoney(v)));
+      });
+      for (let m = 1; m <= 12; m++) svg.appendChild(el("text", { x: L + (m - 0.5) * gw, y: T + ph + 18, "text-anchor": "middle", "font-size": 11.5, "font-weight": 600, fill: "#111111" }, MONTHS[m - 1].slice(0, 3)));
+      const tipLines = (yr, m, v, monthly) => cum ? [MONTHS[m - 1] + " " + yr, "Cumulative Operating Profit " + fmtUsd(v), "Month: " + fmtUsd(monthly)] : [MONTHS[m - 1] + " " + yr, "Operating Profit " + fmtUsd(v)];
+      if (!cum) {
+        for (let m = 1; m <= 12; m++) {
+          const gx = L + (m - 1) * gw, bw = gw * 0.32;
+          [[pyYear, pyS[m], gx + gw * 0.14, "#B7B7B2", null], [cyYear, cyS[m], gx + gw * 0.54, CLIENT.brand, pyS[m]]].forEach(([yr, v, x, color, cmp]) => {
+            if (v === null || v === undefined) return;
+            const neg = v < -0.5, y0 = Y(0), y1 = Y(v);
+            const r = el("rect", { x, y: Math.min(y0, y1), width: bw, height: Math.max(1, Math.abs(y1 - y0)), fill: neg ? NEG : color, "fill-opacity": neg && yr === pyYear ? 0.5 : 1, class: "bar" });
+            const lines = tipLines(yr, m, v, v);
+            if (cmp !== null && cmp !== undefined) lines.push("vs " + pyYear + " (" + fmtUsd(cmp) + "): " + changeText(v, cmp, "op"));
+            hoverTip(r, opTip, lines);
+            svg.appendChild(r);
+          });
+        }
+      } else {
+        const line = (arr, monthly, color, w, yr, label) => {
+          let d = "", last = null;
+          for (let m = 1; m <= 12; m++) {
+            const v = arr[m];
+            if (v === null || v === undefined) continue;
+            const x = L + (m - 0.5) * gw;
+            d += (d ? " L" : "M") + x.toFixed(1) + " " + Y(v).toFixed(1);
+            last = { m, x, v };
+          }
+          if (!d) return;
+          svg.appendChild(el("path", { d, fill: "none", stroke: color, "stroke-width": w, "stroke-linejoin": "round" }));
+          for (let m = 1; m <= 12; m++) {
+            const v = arr[m];
+            if (v === null || v === undefined) continue;
+            const c = el("circle", { cx: L + (m - 0.5) * gw, cy: Y(v), r: 3.6, fill: color, class: "dot" });
+            hoverTip(c, opTip, tipLines(yr, m, v, monthly[m]));
+            svg.appendChild(c);
+          }
+          if (label) svg.appendChild(el("text", { x: last.x, y: Y(last.v) - 9, "text-anchor": last.x > W - 40 ? "end" : "middle", "font-size": 11.5, "font-weight": 700, fill: "#111111" }, fmtMoney(last.v)));
+        };
+        line(pyS, pyM, "#B7B7B2", 2, pyYear, false);
+        line(cyS, cyM, CLIENT.brand, 2.6, cyYear, true);
+      }
+    }
+
+    // Latest month against the year-to-date result, and year to date against the prior year.
+    const sumTo = (a, hi) => { let s = 0; for (let m = 1; m <= hi; m++) { if (a[m] === null) return null; s += a[m]; } return s; };
+    const cyYtd = sumTo(cyM, cutoff), pyYtd = sumTo(pyM, cutoff), last = cyM[cutoff];
+    const rows = [];
+    let text;
+    if (last === null) text = !focused() ? "unavailable, the source has no complete value for this month." : "no record for the selection in this month.";
+    else if (cyYtd === null) text = fmtUsd(last) + ".";
+    else if (last > 0 && cyYtd > 0) text = last <= cyYtd ? fmtUsd(last) + ", " + Math.round(last / cyYtd * 100) + "% of the " + fmtUsd(cyYtd) + " year-to-date Operating Profit."
+      : fmtUsd(last) + ", more than the " + fmtUsd(cyYtd) + " year-to-date Operating Profit, because the earlier months add up to a loss.";
+    else text = fmtUsd(last) + "; year-to-date Operating Profit is " + fmtUsd(cyYtd) + ".";
+    rows.push([MONTHS[cutoff - 1] + " " + cyYear + ": ", text]);
+    rows.push(["Year to date: ", cyYtd === null ? "unavailable, the source has no complete value for at least one month."
+      : pyYtd === null ? fmtUsd(cyYtd) + " (" + pyYear + " is unavailable for at least one month)."
+      : fmtUsd(cyYtd) + " against " + fmtUsd(pyYtd) + " in " + pyYear + " (" + changeText(cyYtd, pyYtd, "op") + ")."]);
+    document.getElementById("opsum").replaceChildren(...rows.map(([a, b]) => { const p = document.createElement("p"); const s = document.createElement("b"); s.textContent = a; p.append(s, b); return p; }));
+  }
+
+  // ---------- Office by Month matrix ----------
+  const fmtCell = v => {
+    const a = Math.abs(v), s = v < 0 ? "-" : "";
+    return a < 0.5 ? "$0" : a >= 1000 ? s + "$" + Math.round(a / 1000).toLocaleString("en-US") + "K" : s + "$" + Math.round(a);
+  };
+  let mxCell = null;   // the selected cell { office, m }; m = 0 is the year-to-date column
+  function drawMatrix() {
+    const host = document.getElementById("mx"), notes = document.getElementById("mx-notes");
+    if (!view) { host.replaceChildren(); notes.replaceChildren(); return; }
+    const { all, cur, cy, cyYear, cutoff } = view;
+    const k = ["rev", "gp", "op"].includes(mxSel.value) ? mxSel.value : "rev";
+    const label = { rev: "Revenue", gp: "Gross Profit", op: "Operating Profit (allocated)" }[k];
+    document.getElementById("mx-title").textContent = label + " by Office and Month, " + cyYear;
+    const offices = [...cur].sort((a, b) => desc(num(a.cy.rev), num(b.cy.rev)) || a.office.localeCompare(b.office));
+    const rows = [{ office: ROOT, label: "Client total", total: true }, ...offices.map(x => ({ office: x.office, label: x.office }))];
+    if (mxCell && (!rows.some(r => r.office === mxCell.office) || mxCell.m > cutoff)) mxCell = null;
+    // undefined = no record for the office-month; null = the measure is missing in the source; otherwise the value
+    const val = (office, m) => {
+      const d = m === 0 ? (office === ROOT ? cy : derive(sums(office, cyYear, cutoff))) : monthD(office, cyYear, m);
+      return d ? d[k] : undefined;
+    };
+    const grid = rows.map(r => ({ r, v: Array.from({ length: cutoff + 1 }, (_, m) => val(r.office, m)) }));   // index 0 = year to date
+    // Month cells share one dollar scale across all offices; the year-to-date column has its own, since it adds up months.
+    let maxM = 0, maxY = 0;
+    grid.filter(g => !g.r.total).forEach(g => g.v.forEach((v, m) => { if (typeof v === "number" && isFinite(v)) { if (m === 0) maxY = Math.max(maxY, Math.abs(v)); else maxM = Math.max(maxM, Math.abs(v)); } }));
+    const head = document.createElement("thead"), hr = document.createElement("tr");
+    const th = (t, cls) => { const h = document.createElement("th"); h.textContent = t; if (cls) h.className = cls; hr.appendChild(h); };
+    th("Office");
+    for (let m = 1; m <= cutoff; m++) th(MONTHS[m - 1].slice(0, 3));
+    th("YTD", "ytd");
+    head.appendChild(hr);
+    const body = document.createElement("tbody");
+    grid.forEach(({ r, v }) => {
+      const tr = document.createElement("tr"); tr.className = r.total ? "total" : isSel(r.office) ? "hl" : "";
+      const nm = document.createElement("td"); nm.className = "nm"; nm.textContent = r.label; tr.appendChild(nm);
+      const order = [...Array.from({ length: cutoff }, (_, i) => i + 1), 0];
+      order.forEach(m => {
+        const x = v[m], td = document.createElement("td"); if (m === 0) td.className = "ytd";
+        const b = document.createElement("button"); b.type = "button"; b.className = "c";
+        b.dataset.office = r.office; b.dataset.m = m;
+        const when = m === 0 ? "year to date" : MONTHS[m - 1] + " " + cyYear;
+        if (x === undefined) { b.textContent = "·"; b.classList.add("nr"); b.title = r.label + ", " + when + ": no record"; }
+        else if (x === null) { b.textContent = "n/a"; b.classList.add("nr"); b.title = r.label + ", " + when + ": a measure is missing in the source"; }
+        else {
+          b.textContent = fmtCell(x); b.title = r.label + ", " + when + ": " + fmtUsd(x);
+          const scale = m === 0 ? maxY : maxM;
+          if (!r.total && scale > 0 && Math.abs(x) >= 0.5) b.style.background = (x < 0 ? "rgba(178,24,43," : "rgba(20,107,58,") + (Math.min(1, Math.abs(x) / scale) * 0.5).toFixed(3) + ")";
+        }
+        b.setAttribute("aria-label", b.title);
+        if (mxCell && mxCell.office === r.office && mxCell.m === m) b.classList.add("sel");
+        td.appendChild(b); tr.appendChild(td);
+      });
+      body.appendChild(tr);
+    });
+    host.replaceChildren(head, body);
+
+    const lines = [];
+    lines.push(k === "op"
+      ? "Office Operating Profit is allocated: Indirect Costs are assigned to offices, so the office rows do not add up to the Client total row."
+      : "Office " + label + " adds up to the Client total row within small recorded differences.");
+    lines.push("Amounts of $1,000 or more are shown in thousands (K); hover a cell for the exact figure. “·” means no record for that office and month, which is not confirmed zero activity. Color intensity uses one dollar scale for all offices in the month columns (strongest at " + fmtUsd(maxM) + ") and its own scale in YTD (" + fmtUsd(maxY) + "). The Client total row is not colored.");
+    const gone = all.filter(x => !activeD(x.cy)).map(x => x.office);
+    if (gone.length) lines.push((gone.length > 1 ? gone.slice(0, -1).join(", ") + " and " + gone[gone.length - 1] : gone[0]) + (gone.length > 1 ? " have" : " has") + " no record in " + cyYear + " and " + (gone.length > 1 ? "are" : "is") + " not shown.");
+    notes.replaceChildren(...lines.map(t => { const p = document.createElement("p"); p.textContent = t; return p; }));
+  }
+  document.getElementById("mx").addEventListener("click", e => {
+    const b = e.target.closest("button.c");
+    if (!b) return;
+    mxCell = { office: b.dataset.office, m: Number(b.dataset.m) };
+    document.querySelectorAll("#mx button.c.sel").forEach(n => n.classList.remove("sel"));
+    b.classList.add("sel");
+    drawMxDetail();
+  });
+  // The five measures of the selected cell, against the same period of the prior year.
+  function drawMxDetail() {
+    const box = document.getElementById("mx-detail");
+    if (!view || !mxCell) {
+      const p = document.createElement("p"); p.className = "hint"; p.textContent = "Select a cell to see its five measures against the same period of the prior year.";
+      box.replaceChildren(p); return;
+    }
+    const { cyYear, pyYear, cutoff, range } = view;
+    const { office, m } = mxCell, isRoot = office === ROOT;
+    const pick = y => m === 0 ? derive(sums(office, y, cutoff)) : monthD(office, y, m);
+    const c = pick(cyYear), p = pick(pyYear);
+    const h = document.createElement("h4");
+    h.textContent = (isRoot ? "Client total" : office) + " · " + (m === 0 ? "year to date, " + range.split(" against ")[0] : MONTHS[m - 1] + " " + cyYear);
+    const alloc = isRoot ? "" : " (allocated)";
+    const ROWS = [["Revenue", "rev", true], ["Direct Labour", "dl", false], ["Direct Overheads", "dov", false], ["Gross Profit", "gp", true], ["Indirect Costs" + alloc, "ind", false], ["Operating Profit" + alloc, "op", true]];
+    const show = (d, key) => !d ? "No record" : d[key] === null ? "n/a" : fmtUsd(d[key]);
+    const table = document.createElement("table"); table.className = "tbl";
+    table.innerHTML = "<thead><tr><th>Measure</th><th>" + cyYear + "</th><th>" + pyYear + (m === 0 ? "" : " (" + MONTHS[m - 1] + ")") + "</th><th>Change $</th></tr></thead>";
+    const body = document.createElement("tbody");
+    ROWS.forEach(([name, key, tone]) => {
+      const tr = document.createElement("tr");
+      const dv = c && p && c[key] !== null && p[key] !== null ? c[key] - p[key] : null;
+      const cells = [[name, ""], [show(c, key), !c || c[key] === null ? "na" : ""], [show(p, key), !p || p[key] === null ? "na" : ""], [fmtUsdSigned(dv), dv === null ? "na" : tone ? (dv >= 0 ? "pos" : "neg") : ""]];
+      cells.forEach(([t, cls]) => { const td = document.createElement("td"); td.textContent = t; if (cls) td.className = cls; tr.appendChild(td); });
+      body.appendChild(tr);
+    });
+    table.appendChild(body);
+    const wrap = document.createElement("div"); wrap.className = "tbl-wrap"; wrap.appendChild(table);
+    box.replaceChildren(h, wrap);
+  }
+
+  // ---------- P&L Summary by Office: three tables over the union of both periods ----------
+  const SUMMARIES = [{ title: "Revenue", k: "rev", kind: "rev", share: true }, { title: "Gross Profit", k: "gp", kind: "gp" }, { title: "Operating Profit", k: "op", kind: "op" }];
+  function drawSummaries() {
+    const host = document.getElementById("sums");
+    if (!view) { host.replaceChildren(); return; }
+    const { all, cy, py } = view;
+    const frag = document.createDocumentFragment();
+    for (const sm of SUMMARIES) {
+      const panel = document.createElement("article"); panel.className = "panel";
+      const h = document.createElement("h3"); h.textContent = sm.title; panel.appendChild(h);
+      const wrap = document.createElement("div"); wrap.className = "tbl-wrap";
+      const table = document.createElement("table"); table.className = "tbl";
+      // Share of client Revenue is shown only when no office has negative Revenue in the period and the client total is positive.
+      const showShare = !!sm.share && cy && cy.rev !== null && cy.rev >= NEAR && all.every(x => !x.cy || (x.cy.rev !== null && x.cy.rev >= 0));
+      const shareTitle = showShare ? "Office Revenue divided by client Revenue, same period"
+        : !cy || cy.rev === null ? "Not shown because client Revenue is unavailable"
+        : cy.rev < NEAR ? "Not shown because client Revenue is not positive"
+        : "Not shown because an office has negative or unavailable Revenue in the period";
+      table.innerHTML = "<thead><tr><th>Office</th><th>Current Year</th>" + (sm.share ? "<th title=\"" + shareTitle + "\">Share</th>" : "") + "<th>Variation $</th><th>Variation %</th></tr></thead>";
+      const body = document.createElement("tbody");
+      const addRow = (label, has, hasP, cv, pv, share, cls) => {
+        const tr = document.createElement("tr"); if (cls) tr.className = cls;
+        // An office with no record in a period counts as zero for Revenue and Gross Profit (the offices reconcile to the
+        // client total); for allocated Operating Profit nothing supports that, so its change needs a record in both periods.
+        const unpaired = !py || ((!has || !hasP) && sm.kind === "op");
+        const dv = (unpaired || cv === null || pv === null) ? null : cv - pv;
+        const c = unpaired ? { word: "—", tone: "na" } : change(sm.kind, cv, pv);
+        let ctext, ccls;
+        if (c.pct !== undefined) { ctext = (c.pct >= 0 ? "▲ " : "▼ ") + Math.abs(c.pct * 100).toFixed(1) + "%"; ccls = c.pct >= 0 ? "pos" : "neg"; }
+        else { ctext = c.word; ccls = c.tone === "neu" ? "na" : c.tone; }
+        const cells = [[label, ""], [has ? fmtUsd(cv) : "No record", has ? "" : "na"]];
+        if (sm.share) cells.push([share, share === "—" ? "na" : ""]);
+        cells.push([fmtUsdSigned(dv), dv === null ? "na" : dv >= 0 ? "pos" : "neg"], [ctext, ccls]);
+        cells.forEach(([t, k]) => { const td = document.createElement("td"); td.textContent = t; if (k) td.className = k; tr.appendChild(td); });
+        body.appendChild(tr);
+      };
+      all.map(x => ({ office: x.office, has: !!x.cy, hasP: !!x.py, cv: x.cy ? x.cy[sm.k] : 0, pv: x.py ? x.py[sm.k] : 0 }))
+        .filter(x => x.cv === null || x.pv === null || Math.abs(x.cv) >= 0.5 || Math.abs(x.pv) >= 0.5)
+        .sort((a, b) => ((b.cv || 0) - (a.cv || 0)) || a.office.localeCompare(b.office))
+        .forEach(x => addRow(x.office, x.has, x.hasP, x.cv, x.pv, showShare && x.has && x.cv !== null ? fmtPct(x.cv / cy.rev) : "—", isSel(x.office) ? "hl" : ""));
+      // The client total comes from the WKI row, not from adding the offices (Operating Profit offices do not add up).
+      if (cy) addRow("Client total", true, !!py, cy[sm.k], py ? py[sm.k] : null, showShare ? "100.0%" : "—", "total");
+      table.appendChild(body); wrap.appendChild(table); panel.appendChild(wrap);
+      frag.appendChild(panel);
+    }
+    host.replaceChildren(frag);
+  }
+
+  // ---------- Profitability by Office table ----------
+  // Default order: Revenue high to low. Header click: natural order first (Office A-Z, numbers high to low), second click reverses, third resets.
+  const desc = (x, y) => x === y ? 0 : x > y ? -1 : 1;
+  const num = v => v === null ? -Infinity : v;
+  let plSort = null, plArgs = null;
+  function plOrder(a, b) {
+    if (plSort) {
+      const c = plSort.key === "label" ? a.office.localeCompare(b.office) : desc(num(a.cy[plSort.key]), num(b.cy[plSort.key]));
+      if (c) return c * plSort.dir;
+    }
+    return desc(num(a.cy.rev), num(b.cy.rev)) || a.office.localeCompare(b.office);
+  }
+  document.querySelector("#pl thead").addEventListener("click", e => {
+    const th = e.target.closest("th[data-k]");
+    if (!th) return;
+    const k = th.dataset.k;
+    plSort = !plSort || plSort.key !== k ? { key: k, dir: 1 } : plSort.dir === 1 ? { key: k, dir: -1 } : null;
+    document.querySelectorAll("#pl thead th").forEach(h => {
+      if (plSort && h.dataset.k === plSort.key) h.setAttribute("aria-sort", (plSort.key === "label") === (plSort.dir === 1) ? "ascending" : "descending");
+      else h.removeAttribute("aria-sort");
+    });
+    if (plArgs) drawProfitability();
+  });
+  function drawProfitability() {
+    if (!plArgs) return;
+    const { offices, total } = plArgs;
+    const cells = d => [fmtUsd(d.rev), fmtUsd(d.dl), fmtUsd(d.dov), fmtUsd(d.gp), fmtUsd(d.ind), fmtUsd(d.op), fmtPct(d.gm), fmtPct(d.om), fmtPct(d.staff)];
+    const tr = (cls, label, d) => {
+      const row = document.createElement("tr"); row.className = cls;
+      const td = document.createElement("td"); td.textContent = label; row.appendChild(td);
+      cells(d).forEach(v => { const c = document.createElement("td"); c.textContent = v; row.appendChild(c); });
+      return row;
+    };
+    const frag = document.createDocumentFragment();
+    if (total) frag.appendChild(tr("total", "Client total", total));
+    [...offices].sort(plOrder).forEach(x => frag.appendChild(tr(isSel(x.office) ? "office hl" : "office", x.office, x.cy)));
+    document.getElementById("pl-body").replaceChildren(frag);
+  }
+  // Notes under the table: the Staff Ratio definition always; the other two only when a visible office needs them.
+  function drawProfitNotes(offices) {
+    const box = document.getElementById("pl-notes");
+    const real = offices.filter(x => x.cy);
+    const neg = real.filter(x => x.cy.dov !== null && x.cy.dov <= -NEAR).map(x => x.office);
+    const zeroRows = real.filter(x => x.cy.rev !== null && x.cy.dl !== null && x.cy.dov !== null && x.cy.rev >= NEAR && Math.abs(x.cy.dl) < NEAR && Math.abs(x.cy.dov) < NEAR);
+    const zeroCost = zeroRows.map(x => x.office);
+    const hundred = zeroRows.every(x => x.cy.gm !== null && Math.abs(x.cy.gm - 1) < 0.0005);   // Gross Margin uses the reported Direct Contribution
+    const list = a => a.length > 1 ? a.slice(0, -1).join(", ") + " and " + a[a.length - 1] : a[0];
+    const lines = ["Staff Ratio is recorded Direct Labour divided by Revenue. It is one component of the Gross Profit change and does not measure staffing capacity or productivity."];
+    if (neg.length) lines.push("Direct Overheads are negative for " + list(neg) + " in this period (recorded reversals). That lowers Direct Costs and can raise Gross Profit above Revenue.");
+    if (zeroCost.length) lines.push(list(zeroCost) + (zeroCost.length > 1 ? " record" : " records") + " no Direct Labour or Direct Overheads in this period" + (hundred ? ", so " + (zeroCost.length > 1 ? "their" : "its") + " Gross Margin is 100%" : "") + ". This reflects recorded costs, not necessarily efficiency.");
+    box.replaceChildren(...lines.map(t => { const p = document.createElement("p"); p.textContent = t; return p; }));
+    box.hidden = false;
+  }
+
+  // ---------- wiring ----------
+  const sourceEl = document.getElementById("source");
+  const keepSource = new URLSearchParams(location.search).has("source");   // ?source in the address shows the data source block
+  const SOURCE_TEXT = {
+    signin: ["Sign in to Tableau", "Use the box below to sign in and load the report. This box disappears once the data loads."],
+    error: ["Tableau view", "The Tableau view that feeds the report could not be loaded. Check your access or sign in here."],
+    source: ["Data source", "The Tableau view below feeds everything on this page. The page reads its data through the Tableau Embedding API and draws the report itself. No Tableau filter is applied: the page keeps only this client's rows."]
+  };
+  const revealSource = (reason) => {
+    const [t, n] = SOURCE_TEXT[reason || "signin"];
+    document.getElementById("source-title").textContent = t;
+    document.getElementById("source-note").textContent = n;
+    viz.setAttribute("height", reason === "source" ? "420" : "260");   // the sign-in box needs little room; the data view more
+    sourceEl.classList.remove("is-hidden"); sourceEl.removeAttribute("aria-hidden");
+  };
+  if (keepSource) revealSource("source");
+  const signinEl = document.getElementById("signin");
+  let interactive = false;
+  // Tableau shows its sign-in inside the embed; if it hasn't loaded after 5 s, point the viewer to it.
+  const signinTimer = setTimeout(() => {
+    if (interactive || (failure && failure.state === "error")) return;
+    failure = { state: "signin", text: "Sign in to Tableau to refresh the data", fallback: "Sign in to Tableau to load data" };
+    showFailure();
+    signinEl.hidden = false;
+    if (!keepSource) revealSource("signin");   // the sign-in box lives inside the Tableau view, shown at the top of the page
+  }, 5000);
+  document.getElementById("signin-btn").addEventListener("click", () =>
+    document.getElementById("source").scrollIntoView({ behavior: "smooth", block: "start" }));
+
+  viz.addEventListener("firstinteractive", () => {
+    interactive = true;
+    clearTimeout(signinTimer);
+    signinEl.hidden = true;
+    if (!keepSource) { sourceEl.classList.add("is-hidden"); sourceEl.setAttribute("aria-hidden", "true"); }
+    if (failure && failure.state === "signin") failure = null;
+    if (!loaded) setState("loading", "Loading data…");
+    refresh();
+  });
+  // Resolves once the saved snapshot (if any) has been shown, so failure messages can always mention it.
+  const cacheReady = (async () => {
+    const c = await cacheGet();
+    if (loaded || !c || !Array.isArray(c.facts) || !c.facts.length) return;
+    try {
+      facts = c.facts;
+      enableSelectors();
+      render();
+    } catch (_) { facts = []; return; }
+    fromCache = true;
+    loaded = true;
+    lastSync = c.time;
+    document.body.classList.remove("is-loading");   // the saved figures are on screen, whatever the status says
+    if (failure) showFailure();
+    else setState("cached", "Showing saved data from " + lastSync + " · Updating…", facts.length + " fact rows from the local cache");
+  })();
+  viz.addEventListener("vizloaderror", async e => {
+    clearTimeout(signinTimer);
+    signinEl.hidden = true;
+    if (!keepSource) revealSource("error");
+    failure = { state: "error", text: "Could not load the Tableau view", fallback: "Error", detail: "Could not load the Tableau view: " + (e.detail && e.detail.message ? e.detail.message : "no detail") };
+    await cacheReady;
+    showFailure();
+  });
+</script>
+</body>
+</html>
