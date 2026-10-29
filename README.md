@@ -56,5 +56,5 @@ Copy any client page and edit only the `window.CLIENT` block at the top of the s
 Then add the page to `PAGES` in `assets/portal-shell.js` and to the client tiles in `index.html`.
 
 ## Tables
-The detailed P&L tables (Global Client Portfolio and Office Profitability) show about 20 rows and scroll inside the
+The detailed P&L tables (Global Client Portfolio and Office Profitability) show about 10 rows and scroll inside the
 table, with a fixed header.
