@@ -1122,7 +1122,7 @@
     const svg = document.getElementById("trend");
     svg.replaceChildren(); trendTip.hidden = true;
     document.getElementById("trend-title").textContent = "Revenue by Month" + (focused() ? ", " + scopeName() : "");
-    document.getElementById("trend-sub").textContent = cyYear + " runs through " + MONTHS[cutoff - 1] + "; " + pyYear + " shows all months. A month with no record has no bar.";
+    document.getElementById("trend-sub").textContent = cyYear + " runs through " + MONTHS[cutoff - 1] + "; " + pyYear + " shows all months. A month with no record has no point and breaks the line.";
     document.getElementById("lg-cy").style.background = TH.cy;
     document.getElementById("lg-py-t").textContent = pyYear;
     document.getElementById("lg-cy-t").textContent = cyYear;
@@ -1148,27 +1148,37 @@
         svg.appendChild(el("line", { x1: L, x2: W - R, y1: Y(v), y2: Y(v), stroke: v === 0 ? TH.ink3 : TH.grid, "stroke-width": v === 0 ? 1.2 : 1 }));
         svg.appendChild(el("text", { x: L - 8, y: Y(v) + 4, "text-anchor": "end", "font-size": 11.5, fill: v < 0 ? NEG : TH.ink3 }, fmtMoney(v)));
       });
-      for (let m = 1; m <= 12; m++) {
-        const gx = L + (m - 1) * gw, bw = gw * 0.32;
-        svg.appendChild(el("text", { x: gx + gw / 2, y: T + ph + 18, "text-anchor": "middle", "font-size": 11.5, "font-weight": 600, fill: TH.ink }, MONTHS[m - 1].slice(0, 3)));
-        [[pyYear, pyV[m], gx + gw * 0.14, TH.py, null], [cyYear, cyV[m], gx + gw * 0.54, TH.cy, pyV[m]]].forEach(([yr, v, x, color, cmp]) => {
-          if (v === null || v === undefined) return;
-          const neg = v < -0.5;
-          const y0 = Y(0), y1 = Y(v);
-          const r = el("rect", { x, y: Math.min(y0, y1), width: bw, height: Math.max(1, Math.abs(y1 - y0)), fill: neg ? NEG : color, "fill-opacity": neg && yr === pyYear ? 0.5 : 1, class: "bar" });
-          r.addEventListener("mouseenter", () => {
+      // One line per year (a month with no value breaks the line instead of drawing a zero); a dot marks each month.
+      const px = m => L + (m - 0.5) * gw;
+      for (let m = 1; m <= 12; m++) svg.appendChild(el("text", { x: px(m), y: T + ph + 18, "text-anchor": "middle", "font-size": 11.5, "font-weight": 600, fill: TH.ink }, MONTHS[m - 1].slice(0, 3)));
+      const series = (yr, arr, color, width, cmpArr) => {
+        let d = "", pen = false;
+        for (let m = 1; m <= 12; m++) {
+          const v = arr[m];
+          if (v === null || v === undefined) { pen = false; continue; }
+          d += (pen ? " L" : " M") + px(m).toFixed(1) + " " + Y(v).toFixed(1);
+          pen = true;
+        }
+        if (d) svg.appendChild(el("path", { d: d.trim(), fill: "none", stroke: color, "stroke-width": width, "stroke-linejoin": "round", "stroke-linecap": "round" }));
+        for (let m = 1; m <= 12; m++) {
+          const v = arr[m], cmp = cmpArr ? cmpArr[m] : null;
+          if (v === null || v === undefined) continue;
+          const dot = el("circle", { cx: px(m), cy: Y(v), r: 3.8, fill: v < -0.5 ? NEG : color, class: "bar" });
+          dot.addEventListener("mouseenter", () => {
             trendTip.replaceChildren();
-            const a = document.createElement("div"); a.style.fontWeight = "700"; a.textContent = MONTHS[m - 1] + " " + yr;
-            const b = document.createElement("div"); b.textContent = "Revenue " + fmtUsd(v);
-            trendTip.append(a, b);
-            if (cmp !== null && cmp !== undefined) { const c = document.createElement("div"); c.textContent = "vs " + pyYear + " (" + fmtUsd(cmp) + "): " + changeText(v, cmp); trendTip.appendChild(c); }
+            const t1 = document.createElement("div"); t1.style.fontWeight = "700"; t1.textContent = MONTHS[m - 1] + " " + yr;
+            const t2 = document.createElement("div"); t2.textContent = "Revenue " + fmtUsd(v);
+            trendTip.append(t1, t2);
+            if (cmp !== null && cmp !== undefined) { const t3 = document.createElement("div"); t3.textContent = "vs " + pyYear + " (" + fmtUsd(cmp) + "): " + changeText(v, cmp); trendTip.appendChild(t3); }
             trendTip.hidden = false;
           });
-          r.addEventListener("mousemove", moveTrendTip);
-          r.addEventListener("mouseleave", () => { trendTip.hidden = true; });
-          svg.appendChild(r);
-        });
-      }
+          dot.addEventListener("mousemove", moveTrendTip);
+          dot.addEventListener("mouseleave", () => { trendTip.hidden = true; });
+          svg.appendChild(dot);
+        }
+      };
+      series(pyYear, pyV, TH.py, 2, null);
+      series(cyYear, cyV, TH.cy, 2.6, pyV);
     }
 
     // Latest month and last three months against the same months of the prior year (Revenue only).
